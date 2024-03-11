@@ -30,12 +30,22 @@ export class User extends BaseSchema {
   @Prop({ required: true })
   password: string;
 
+  @Prop({ required: false })
+  secret: string;
+
   @ApiProperty({
     example: 'true',
     description: 'If User account has been verified',
   })
   @Prop({ default: false })
   is_verified: boolean;
+
+  @ApiProperty({
+    example: 'true',
+    description: 'If User account has been verified',
+  })
+  @Prop({ default: false })
+  is_2FA_enabled: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
