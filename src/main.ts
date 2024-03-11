@@ -23,6 +23,10 @@ async function bootstrap() {
     .setTitle('FXKARA API DOCS')
     .setDescription('Documentation for fxKara api')
     .setVersion('1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', in: 'header' },
+      'Authorization',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

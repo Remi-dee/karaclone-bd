@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { User, UserDocument } from './user.schema';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { IUserDetails } from './user.dto';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UserService {
@@ -28,5 +29,13 @@ export class UserService {
   async findOneByEmail(email: string): Promise<User | undefined> {
     if (email.includes('@'))
       return await this.userModel.findOne({ email: email });
+  }
+
+  async findOneById(id: ObjectId): Promise<User | null> {
+    try {
+      return await this.userModel.findById(id).exec();
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong');
+    }
   }
 }

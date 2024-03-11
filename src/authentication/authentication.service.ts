@@ -6,7 +6,6 @@ import { User, UserDocument } from '../user/user.schema';
 import { UserService } from '../user/user.service';
 import {
   IAuthenticationResponse,
-  ISignUpResponse,
   LoginUserDTO,
   RegisterUserDTO,
 } from '../user/user.dto';
@@ -14,6 +13,8 @@ import * as argon from 'argon2';
 import ErrorHandler from '../utils/ErrorHandler';
 import { MailService } from '../mail/mail.service';
 import { IActivationRequest, IActivationToken } from './authentication.dto';
+import * as speakeasy from 'speakeasy';
+import * as qrcode from 'qrcode';
 
 @Injectable()
 export class AuthenticationService {
@@ -47,43 +48,13 @@ export class AuthenticationService {
 
     const payload = {
       email: userDetails.email,
-      sub: userDetails.id,
+      sub: userDetails._id,
     };
     return {
       user: this.userService.getUserDetails(userDetails),
       accessToken: this.jwtService.sign(payload),
     };
   }
-
-  //   async register(registerUserDTO: RegisterUserDTO): Promise<ISignUpResponse> {
-  //     const { email, password } = registerUserDTO;
-
-  //     if (!this.isValidEmail(email)) {
-  //       throw new ErrorHandler('Invalid email address.', 400);
-  //     }
-
-  //     const isEmailExist = await this.userModel.findOne({ email });
-  //     if (isEmailExist) {
-  //       throw new ErrorHandler('Email already exist', 400);
-  //     }
-
-  //     const hashedPassword = await argon.hash(password);
-
-  //     // const user = await this.userModel.create({
-  //     //   email,
-  //     //   password: hashedPassword,
-  //     // });
-
-  //     const payload = {
-  //       email: user.email,
-  //       sub: user._id,
-  //     };
-
-  //     return {
-  //       data: user,
-  //       token: this.jwtService.sign(payload),
-  //     };
-  //   }
 
   async register(regBody: RegisterUserDTO) {
     const { name, email, password } = regBody;
@@ -155,12 +126,25 @@ export class AuthenticationService {
       throw new ErrorHandler('Email already exist', 400);
     }
 
+    const secret = speakeasy.generateSecret({ length: 20 });
+
     const hashedPassword = await argon.hash(password);
 
     await this.userModel.create({
       name,
       email,
+      secret: secret.base32,
       password: hashedPassword,
+      is_verified: true,
     });
+  }
+
+  async generateQrCode(data: string): Promise<string> {
+    try {
+      const qrCode = await qrcode.toDataURL(data);
+      return qrCode;
+    } catch (error) {
+      throw new Error('Error generating QR code');
+    }
   }
 }
