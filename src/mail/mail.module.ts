@@ -3,7 +3,7 @@ import { Global, Module } from '@nestjs/common';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { MailService } from './mail.service';
+import { EMailService } from './mail.service';
 
 @Global()
 @Module({
@@ -34,7 +34,7 @@ import { MailService } from './mail.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [MailService],
-  exports: [MailService],
+  providers: [EMailService],
+  exports: [EMailService],
 })
 export class MailModule {}

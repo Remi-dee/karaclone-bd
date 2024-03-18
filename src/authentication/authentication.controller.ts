@@ -5,8 +5,10 @@ import {
   HttpStatus,
   Next,
   Res,
+  Req,
   Get,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -22,8 +24,6 @@ import { AuthenticationService } from './authentication.service';
 import ErrorHandler from '../utils/ErrorHandler';
 import { IActivationRequest } from './authentication.dto';
 import { UserService } from '../user/user.service';
-import { ObjectId } from 'mongodb';
-import { ParseObjectIdPipe } from '../app.pipe';
 
 @ApiTags('Authentication')
 @Controller('authentication')
@@ -138,38 +138,5 @@ export class AuthenticationController {
         return next(new ErrorHandler(error.message, 400));
       }
     }
-  }
-
-  @Get('enable-2fa/:id')
-  @ApiOperation({
-    summary: 'Enable 2FA for user',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Enable 2FA for user',
-  })
-  @ApiBadRequestResponse({
-    description: 'Failed to enable 2FA',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'UnauthorisedException: Invalid credentials',
-  })
-  async enableTwoFactorAuth(
-    @Res() res,
-    @Param('id', ParseObjectIdPipe) id: ObjectId,
-  ) {
-    const user = await this.userService.findOneById(id);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Generate QR code for the user's secret key
-    const qrCode = await this.authService.generateQrCode(
-      `otpauth://totp/FxKara:${user.name}?secret=${user.secret}&issuer=FxKara`,
-    );
-
-    // Send the QR code to the client
-    res.status(200).json({ qrCode });
   }
 }

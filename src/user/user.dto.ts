@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsEmail, Matches } from 'class-validator';
-import { E_USER_ROLE } from './user.enum';
+import { E_USER_TYPE } from './user.enum';
 import { REGEX, MESSAGES } from 'src/app.util';
 import { User } from './user.schema';
 
@@ -9,7 +9,12 @@ export interface IUserDetails {
   name: string;
   email: string;
   phone: string;
-  role: E_USER_ROLE;
+  gender: string;
+  account_type: E_USER_TYPE;
+  business_name: string;
+  business_address: string;
+  business_email: string;
+  business_line: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,10 +47,34 @@ export class RegisterUserDTO {
   @IsNotEmpty({ message: 'Name is required' })
   readonly name: string;
 
+  @ApiProperty({ description: 'Gender of user' })
+  @IsNotEmpty({ message: 'Gender is required' })
+  readonly gender: string;
+
+  @ApiProperty({ description: 'Account type of user' })
+  @IsNotEmpty({ message: 'Account type is required' })
+  readonly account_type: E_USER_TYPE;
+
   @ApiProperty({ description: 'Email of user' })
   @IsNotEmpty({ message: 'Email is required' })
   @IsEmail()
   readonly email: string;
+
+  @ApiProperty({ description: 'Phone number of user' })
+  @IsNotEmpty({ message: 'Phone number is required' })
+  readonly phone: string;
+
+  @ApiProperty({ description: 'Business number of user' })
+  readonly business_name: string;
+
+  @ApiProperty({ description: 'Phone number of user' })
+  readonly business_address: string;
+
+  @ApiProperty({ description: 'Phone number of user' })
+  readonly business_email: string;
+
+  @ApiProperty({ description: 'Phone number of user' })
+  readonly business_line: string;
 
   @ApiProperty({ description: 'User Password' })
   @IsNotEmpty({ message: 'Password is required' })
