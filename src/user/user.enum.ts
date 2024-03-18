@@ -1,4 +1,5 @@
-export enum E_USER_ROLE {
+export enum E_USER_TYPE {
   ADMIN = 'admin',
-  user = 'user',
+  INDIVIDUAL = 'individual',
+  BUSINESS = 'business',
 }

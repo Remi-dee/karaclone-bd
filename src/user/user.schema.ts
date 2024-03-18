@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { BaseSchema } from './../app.schema';
-import { E_USER_ROLE } from './user.enum';
+import { E_USER_TYPE } from './user.enum';
+import { Wallet } from 'src/wallet/wallet.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -23,15 +24,39 @@ export class User extends BaseSchema {
   @Prop({ required: false })
   phone: string;
 
-  @ApiProperty({ example: 'admin', description: 'Role of user' })
-  @Prop({ default: E_USER_ROLE.user })
-  role: E_USER_ROLE;
+  @ApiProperty({ example: 'Individual', description: 'Role of user' })
+  @Prop({ default: E_USER_TYPE.INDIVIDUAL })
+  account_type: E_USER_TYPE;
 
   @Prop({ required: true })
   password: string;
 
   @Prop({ required: false })
   secret: string;
+
+  @Prop({ required: false })
+  gender: string;
+
+  @Prop({ required: false })
+  business_name: string;
+
+  @Prop({ required: false })
+  business_address: string;
+
+  @Prop({ required: false })
+  business_email: string;
+
+  @Prop({ required: false })
+  business_line: string;
+
+  @Prop({ required: false })
+  cac_document: string;
+
+  @Prop({ required: true })
+  public_key: string;
+
+  @Prop({ required: true })
+  secret_key: string;
 
   @ApiProperty({
     example: 'true',
@@ -46,6 +71,9 @@ export class User extends BaseSchema {
   })
   @Prop({ default: false })
   is_2FA_enabled: boolean;
+
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Wallet' }] })
+  wallets: Wallet[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

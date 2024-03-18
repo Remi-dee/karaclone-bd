@@ -11,10 +11,10 @@ import {
 } from '../user/user.dto';
 import * as argon from 'argon2';
 import ErrorHandler from '../utils/ErrorHandler';
-import { MailService } from '../mail/mail.service';
+import { EMailService } from '../mail/mail.service';
 import { IActivationRequest, IActivationToken } from './authentication.dto';
 import * as speakeasy from 'speakeasy';
-import * as qrcode from 'qrcode';
+import { Keypair } from 'stellar-sdk';
 
 @Injectable()
 export class AuthenticationService {
@@ -22,7 +22,7 @@ export class AuthenticationService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private userService: UserService,
     private jwtService: JwtService,
-    private mailService: MailService,
+    private mailService: EMailService,
   ) {}
 
   isValidEmail(email: string): boolean {
@@ -57,7 +57,18 @@ export class AuthenticationService {
   }
 
   async register(regBody: RegisterUserDTO) {
-    const { name, email, password } = regBody;
+    const {
+      name,
+      email,
+      password,
+      account_type,
+      business_address,
+      gender,
+      phone,
+      business_email,
+      business_line,
+      business_name,
+    } = regBody;
 
     if (!this.isValidEmail(email)) {
       throw new ErrorHandler('Invalid email address.', 400);
@@ -72,6 +83,13 @@ export class AuthenticationService {
       name,
       email,
       password,
+      account_type,
+      business_address,
+      gender,
+      phone,
+      business_email,
+      business_line,
+      business_name,
     };
 
     const activationToken = this.createActivationToken(user);
@@ -118,13 +136,34 @@ export class AuthenticationService {
       throw new ErrorHandler('Invalid activation code', 400);
     }
 
-    const { name, email, password } = newUser.user;
+    const {
+      name,
+      email,
+      password,
+      account_type,
+      gender,
+      phone,
+      business_name,
+      business_address,
+      business_email,
+      business_line,
+    } = newUser.user;
 
     const existUser = await this.userModel.findOne({ email });
 
     if (existUser) {
       throw new ErrorHandler('Email already exist', 400);
     }
+
+    // Generate a new Stellar key pair
+    const pair = Keypair.random();
+
+    // Get the public and secret keys
+    const publicKey = pair.publicKey();
+    const secretKey = pair.secret();
+
+    console.log('public', publicKey);
+    console.log('secret', secretKey);
 
     const secret = speakeasy.generateSecret({ length: 20 });
 
@@ -133,18 +172,18 @@ export class AuthenticationService {
     await this.userModel.create({
       name,
       email,
+      account_type,
+      gender,
+      phone,
+      business_name,
+      business_address,
+      business_email,
+      business_line,
       secret: secret.base32,
+      public_key: publicKey,
+      secret_key: secretKey,
       password: hashedPassword,
       is_verified: true,
     });
-  }
-
-  async generateQrCode(data: string): Promise<string> {
-    try {
-      const qrCode = await qrcode.toDataURL(data);
-      return qrCode;
-    } catch (error) {
-      throw new Error('Error generating QR code');
-    }
   }
 }
