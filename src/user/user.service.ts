@@ -5,6 +5,7 @@ import mongoose, { Model } from 'mongoose';
 import { IUserDetails } from './user.dto';
 import { ObjectId } from 'mongodb';
 import * as qrcode from 'qrcode';
+import * as speakeasy from 'speakeasy';
 
 @Injectable()
 export class UserService {
@@ -51,6 +52,22 @@ export class UserService {
       return qrCode;
     } catch (error) {
       throw new Error('Error generating QR code');
+    }
+  }
+
+  async verifyTOTP(userSecret: string, userTOTP: string): Promise<boolean> {
+    try {
+      // Generate a TOTP code based on the user's secret
+      const verified = speakeasy.totp.verify({
+        secret: userSecret,
+        encoding: 'base32',
+        token: userTOTP,
+      });
+
+      // Return whether the TOTP provided by the user matches the generated one
+      return verified;
+    } catch (error) {
+      throw new Error('Error verifying TOTP');
     }
   }
 }

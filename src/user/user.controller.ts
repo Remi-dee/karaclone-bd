@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -50,5 +50,35 @@ export class UserController {
 
     // Send the QR code to the client
     res.status(200).json({ qrCode });
+  }
+
+  @Get('verify-2fa')
+  @ApiOperation({
+    summary: 'Enable 2FA for user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Enable 2FA for user',
+  })
+  @ApiBadRequestResponse({
+    description: 'Failed to enable 2FA',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'UnauthorisedException: Invalid credentials',
+  })
+  async verifyTwoFactorAuth(@Res() res, @Req() req, @Body() topt: string) {
+    const id = req.user.id;
+
+    const user = await this.userService.findOneById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Generate QR code for the user's secret key
+    const verifyCode = await this.userService.verifyTOTP(user.secret,topt)
+
+    // Send the QR code to the client
+    res.status(200).json({ verifyCode });
   }
 }

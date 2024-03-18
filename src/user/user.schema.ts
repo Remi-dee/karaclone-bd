@@ -49,8 +49,11 @@ export class User extends BaseSchema {
   @Prop({ required: false })
   business_line: string;
 
-  @Prop({ required: false })
-  cac_document: string;
+  @Prop({ required: false, type: Object })
+  cac_document: {
+    public_id: string,
+    url: string,
+  }
 
   @Prop({ required: true })
   public_key: string;
