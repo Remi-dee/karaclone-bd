@@ -1,6 +1,7 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { now, ObjectId } from 'mongoose';
+import { now } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 export class BaseSchema {
   @ApiProperty({ example: '641cde26cbf530b653fefe5a', description: 'Id' })

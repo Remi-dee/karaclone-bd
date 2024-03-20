@@ -53,7 +53,6 @@ export class TransactionController {
   ) {
     try {
       const id = req.user.id;
-      console.log(id);
       const fundWallet = await this.transactionService.fundWalletService(
         id,
         fundWalletBody,

@@ -39,11 +39,7 @@ export class UserService {
   }
 
   async findOneById(id: ObjectId): Promise<User | null> {
-    try {
-      return await this.userModel.findById(id).exec();
-    } catch (error) {
-      throw new InternalServerErrorException('Something went wrong');
-    }
+    return await this.userModel.findById(id).exec();
   }
 
   async generateQrCode(data: string): Promise<string> {

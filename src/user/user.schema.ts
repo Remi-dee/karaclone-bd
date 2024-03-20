@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { BaseSchema } from './../app.schema';
 import { E_USER_TYPE } from './user.enum';
 import { Wallet } from 'src/wallet/wallet.schema';
+import { ObjectId } from 'mongodb';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -51,9 +52,9 @@ export class User extends BaseSchema {
 
   @Prop({ required: false, type: Object })
   cac_document: {
-    public_id: string,
-    url: string,
-  }
+    public_id: string;
+    url: string;
+  };
 
   @Prop({ required: true })
   public_key: string;
@@ -75,7 +76,7 @@ export class User extends BaseSchema {
   @Prop({ default: false })
   is_2FA_enabled: boolean;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Wallet' }] })
+  @Prop({ type: [{ type: ObjectId, ref: 'Wallet' }] })
   wallets: Wallet[];
 }
 
