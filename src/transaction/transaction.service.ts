@@ -32,36 +32,22 @@ export class TransactionService {
       throw new ErrorHandler('User not found', 400);
     }
 
-    const userWallets = await this.walletService.findWalletsByUser(user._id);
-
-    const fundWallet = await this.paystackService.initializeTransaction(
-      amount,
-      user.email,
-    );
-
     const newWallet = {
-      userId: user._id.toString(),
       currency_code: currency_code,
+      escrow_balance: amount,
     } as CreateWalletDTO;
 
-    // update wallet if already existing or create a new one
-    let walletUpdated = false;
-    for (const wallet of userWallets) {
-      if (wallet.currency_code === currency_code) {
-        const update = {
-          escrow_balance: wallet.escrow_balance + amount,
-        } as UpdateWalletDTO;
+    const userWallets = await this.walletService.getAllWalletsByUser(user._id);
 
-        await this.walletService.updateWallet(wallet._id, update);
-        walletUpdated = true;
-        break;
-      }
-    }
-
-    if (walletUpdated != true) {
+    if (userWallets.length <= 0) {
       const walletcreate = await this.walletService.createWallet(
-        user?._id,
+        user._id,
         newWallet,
+      );
+
+      const fundWallet = await this.paystackService.initializeTransaction(
+        amount,
+        user.email,
       );
 
       const createTransaction = await this.transactModel.create({
@@ -71,8 +57,41 @@ export class TransactionService {
       });
 
       walletcreate.transactions.push(createTransaction);
+      await walletcreate.save();
 
       return createTransaction;
+    } else if (userWallets.length > 0) {
+      const updates = userWallets.map(async (wallet) => {
+        if (wallet.currency_code == currency_code) {
+          const update = {
+            escrow_balance: wallet.escrow_balance + amount,
+          } as UpdateWalletDTO;
+
+          const updateWallet = await this.walletService.updateWallet(
+            wallet._id,
+            update,
+          );
+
+          const fundWallet = await this.paystackService.initializeTransaction(
+            amount,
+            user.email,
+          );
+
+          const createTransaction = await this.transactModel.create({
+            type: 'paystack',
+            amount: amount,
+            reference_number: fundWallet.reference,
+          });
+
+          // Push the newly created transaction to the wallet's transactions array
+          updateWallet.transactions.push(createTransaction);
+          await updateWallet.save(); // Save the updated wallet
+
+          return createTransaction;
+        }
+      });
+
+      return Promise.all(updates);
     }
   }
 }

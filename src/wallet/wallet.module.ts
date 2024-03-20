@@ -2,8 +2,9 @@ import { Module, forwardRef } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { Wallet, WalletSchema } from './wallet.schema';
 import { MongooseModule } from '@nestjs/mongoose';
-import { TransactionModule } from 'src/transaction/transaction.module';
-import { User, UserSchema } from 'src/user/user.schema';
+import { TransactionModule } from '../transaction/transaction.module';
+import { User, UserSchema } from '../user/user.schema';
+import { WalletController } from './wallet.controller';
 
 @Module({
   imports: [
@@ -13,5 +14,6 @@ import { User, UserSchema } from 'src/user/user.schema';
   ],
   providers: [WalletService],
   exports: [WalletService],
+  controllers: [WalletController],
 })
 export class WalletModule {}

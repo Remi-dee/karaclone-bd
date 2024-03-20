@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
 export class CreateWalletDTO {
-  @ApiProperty({ description: 'User Id' })
-  @IsNotEmpty({ message: 'User Id is required' })
-  readonly userId: string;
+  // @ApiProperty({ description: 'User Id' })
+  // @IsNotEmpty({ message: 'User Id is required' })
+  // readonly userId: string;
 
   @ApiProperty({ description: 'Wallet currency code' })
   @IsNotEmpty({ message: 'Currency code is required' })

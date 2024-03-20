@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsEmail, Matches } from 'class-validator';
 import { E_USER_TYPE } from './user.enum';
-import { REGEX, MESSAGES } from 'src/app.util';
+import { REGEX, MESSAGES } from '../app.util';
 import { User } from './user.schema';
 
 export interface IUserDetails {

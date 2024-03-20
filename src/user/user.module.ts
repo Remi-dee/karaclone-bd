@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
 import { JwtModule } from '@nestjs/jwt';
-import { TransactionModule } from 'src/transaction/transaction.module';
+import { TransactionModule } from '../transaction/transaction.module';
 
 @Module({
   imports: [

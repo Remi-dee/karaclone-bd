@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument } from 'mongoose';
 import { BaseSchema } from './../app.schema';
 import { E_USER_TYPE } from './user.enum';
-import { Wallet } from 'src/wallet/wallet.schema';
+import { Wallet } from '../wallet/wallet.schema';
 import { ObjectId } from 'mongodb';
 
 export type UserDocument = HydratedDocument<User>;
