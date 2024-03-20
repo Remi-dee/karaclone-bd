@@ -162,9 +162,6 @@ export class AuthenticationService {
     const publicKey = pair.publicKey();
     const secretKey = pair.secret();
 
-    console.log('public', publicKey);
-    console.log('secret', secretKey);
-
     const secret = speakeasy.generateSecret({ length: 20 });
 
     const hashedPassword = await argon.hash(password);

@@ -8,7 +8,7 @@ import { UserModule } from '../user/user.module';
 import { UserService } from '../user/user.service';
 import { WalletService } from '../wallet/wallet.service';
 import { WalletModule } from '../wallet/wallet.module';
-import { Wallet, WalletSchema } from 'src/wallet/wallet.schema';
+import { Wallet, WalletSchema } from '../wallet/wallet.schema';
 import { Transaction, TransactionSchema } from './transaction.schema';
 
 @Module({
