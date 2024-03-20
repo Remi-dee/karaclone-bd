@@ -1,5 +1,3 @@
-// paystack.service.ts
-
 import { Injectable } from '@nestjs/common';
 import * as Paystack from 'paystack';
 
@@ -16,12 +14,10 @@ export class PaystackService {
       amount: amount * 100, // Paystack expects amount in kobo (1 Naira = 100 kobo)
       email,
     };
-    console.log(initializeTransactionRequest);
     try {
       const response = await this.paystack.transaction.initialize(
         initializeTransactionRequest,
       );
-      console.log(response.data);
       return response.data;
     } catch (error) {
       throw new Error(`Error initializing transaction: ${error.message}`);

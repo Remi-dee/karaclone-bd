@@ -13,6 +13,7 @@ import { TransactionModule } from 'src/transaction/transaction.module';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1d' },
     }),
+    forwardRef(() => TransactionModule),
   ],
   controllers: [UserController],
   providers: [UserService],

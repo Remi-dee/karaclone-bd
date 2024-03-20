@@ -8,13 +8,13 @@ export type TransactionDocument = HydratedDocument<Transaction>;
 @Schema({ timestamps: true })
 export class Transaction extends BaseSchema {
   @Prop({ required: true })
-  type: string; 
+  type: string;
 
   @Prop({ required: true, default: 0 })
   amount: number;
 
   @Prop({ required: false })
-  description: string;
+  reference_number: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
