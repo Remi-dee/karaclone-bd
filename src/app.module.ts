@@ -9,6 +9,7 @@ import { MailModule } from './mail/mail.module';
 import { WalletModule } from './wallet/wallet.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { PaystackModule } from './paystack/paystack.module';
+import { StellarModule } from './stellar/stellar.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -21,6 +22,7 @@ import configuration from './config/configuration';
     WalletModule,
     TransactionModule,
     PaystackModule,
+    StellarModule,
   ],
   controllers: [AppController],
   providers: [AppService],
