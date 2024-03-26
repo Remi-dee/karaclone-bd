@@ -8,7 +8,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import {config as dotenvConfig} from "dotenv"
 // require('dotenv').config();
 dotenvConfig()
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.gNODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -16,7 +16,7 @@ async function bootstrap() {
   app.setGlobalPrefix('/api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.enableCors({
-    origin: [''],
+    origin: ['http://localhost:3000'],
     credentials: true,
   });
 

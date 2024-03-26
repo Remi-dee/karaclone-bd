@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { User, UserDocument } from './user.schema';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { IUserDetails } from './user.dto';
+import { IUserDetails, Verify2FADTO } from './user.dto';
 import { ObjectId } from 'mongodb';
 import * as qrcode from 'qrcode';
 import * as speakeasy from 'speakeasy';
@@ -42,22 +42,30 @@ export class UserService {
     return await this.userModel.findById(id).exec();
   }
 
-  async generateQrCode(data: string): Promise<string> {
+  async generateQrCode(data: string, id: ObjectId): Promise<string> {
     try {
       const qrCode = await qrcode.toDataURL(data);
+
+      const updateUser = await this.userModel.findByIdAndUpdate(id, {
+        is_2FA_enabled: true,
+      });
+      updateUser.save();
       return qrCode;
     } catch (error) {
       throw new Error('Error generating QR code');
     }
   }
 
-  async verifyTOTP(userSecret: string, userTOTP: string): Promise<boolean> {
+  async verifyTOTP(
+    userSecret: string,
+    userTOTP: Verify2FADTO,
+  ): Promise<boolean> {
     try {
       // Generate a TOTP code based on the user's secret
       const verified = speakeasy.totp.verify({
         secret: userSecret,
         encoding: 'base32',
-        token: userTOTP,
+        token: userTOTP.topt,
       });
 
       // Return whether the TOTP provided by the user matches the generated one
