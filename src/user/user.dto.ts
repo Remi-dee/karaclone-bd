@@ -97,3 +97,9 @@ export class LoginUserDTO {
   })
   readonly password: string;
 }
+
+export class Verify2FADTO {
+  @ApiProperty({ description: 'User one-time password' })
+  @IsNotEmpty({ message: 'User one-time password is required' })
+  readonly topt: string;
+}
