@@ -5,7 +5,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ErrorMiddleware } from './middleware/Error';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { v2 as cloudinary } from 'cloudinary';
-require('dotenv').config();
+import {config as dotenvConfig} from "dotenv"
+// require('dotenv').config();
+dotenvConfig()
+process.env.gNODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

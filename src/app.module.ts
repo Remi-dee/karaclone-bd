@@ -11,6 +11,7 @@ import { TransactionModule } from './transaction/transaction.module';
 import { PaystackModule } from './paystack/paystack.module';
 import { StellarModule } from './stellar/stellar.module';
 import configuration from './config/configuration';
+import { currencyPairModule } from './currencyPair/currency-pair.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import configuration from './config/configuration';
     TransactionModule,
     PaystackModule,
     StellarModule,
+    currencyPairModule,
   ],
   controllers: [AppController],
   providers: [AppService],
