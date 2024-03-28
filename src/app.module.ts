@@ -12,7 +12,7 @@ import { PaystackModule } from './paystack/paystack.module';
 import { StellarModule } from './stellar/stellar.module';
 import configuration from './config/configuration';
 import { currencyPairModule } from './currencyPair/currency-pair.module';
-import { FeeModule } from './fee/fee.module';
+import { FeeModule } from './fee/transaction-fee.module';
 
 @Module({
   imports: [
