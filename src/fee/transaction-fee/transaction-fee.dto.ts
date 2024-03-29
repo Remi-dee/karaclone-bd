@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
+import { ObjectId } from 'mongoose';
 
 export class CreateTransactionFeeDTO {
   @ApiProperty({ description: 'Transaction type' })
@@ -28,6 +29,10 @@ export class CreateTransactionFeeDTO {
 }
 
 export class UpdateTransactionFeeDTO {
+  @ApiProperty({ description: 'Transaction ID' })
+  @IsNotEmpty({ message: 'Transaction ID is required' })
+  readonly feeId: ObjectId;
+
   @ApiProperty({ description: 'Transaction type' })
   @IsNotEmpty({ message: 'Transaction type is required' })
   readonly transaction_type: string;

@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Document, } from 'mongoose';
 import { BaseSchema } from 'src/app.schema';
 
-export type TransactionFeeDocument = HydratedDocument<TransactionFee>;
+export type TransactionFeeDocument = TransactionFee & Document;
 
 @Schema({ timestamps: true })
 export class TransactionFee extends BaseSchema {
