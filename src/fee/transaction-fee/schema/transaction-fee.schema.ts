@@ -16,7 +16,7 @@ export class TransactionFee extends BaseSchema {
   minimum_amount: string;
 
   @Prop({ required: true })
-  maximummum_amount: string;
+  maximum_amount: string;
 
   @Prop({ required: true })
   currency_pair: string;

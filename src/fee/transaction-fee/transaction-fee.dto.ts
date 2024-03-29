@@ -17,7 +17,7 @@ export class CreateTransactionFeeDTO {
 
   @ApiProperty({ description: 'Maximum amount' })
   @IsNotEmpty({ message: 'Maximum amount is required' })
-  readonly maximummum_amount: string;
+  readonly maximum_amount: string;
 
   @ApiProperty({ description: 'Currency pair' })
   @IsNotEmpty({ message: 'Currency pair is required' })
@@ -47,7 +47,7 @@ export class UpdateTransactionFeeDTO {
 
   @ApiProperty({ description: 'Maximum amount' })
   @IsNotEmpty({ message: 'Maximum amount is required' })
-  readonly maximummum_amount: string;
+  readonly maximum_amount: string;
 
   @ApiProperty({ description: 'Currency pair' })
   @IsNotEmpty({ message: 'Currency pair is required' })

@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   NotFoundException,
-
   Post,
   Put,
   Req,
@@ -55,13 +54,13 @@ export class TransactionFeeController {
   })
   async createTransactionFee(
     @Body() transactionFeeDTO: CreateTransactionFeeDTO,
-    @Res() res,
-    @Req() req,
+    // @Res() res,
+    // @Req() req,
   ) {
-    const id = req.user.id;
+    // const id = req.user.id;
 
     return this.transactionFeeService.createTransactionFee(
-      id,
+      //   id,
       transactionFeeDTO,
     );
   }
@@ -77,14 +76,14 @@ export class TransactionFeeController {
   })
   async updateTransactionFee(
     @Body() updateData: UpdateTransactionFeeDTO,
-    @Req() req,
+    // @Req() req,
   ) {
     const feeId = updateData.feeId;
-    const userId = req.user.id;
+    // const userId = req.user.id;
 
     try {
       const updatedFee = await this.transactionFeeService.updateTransactionFee(
-        userId,
+        // userId,
         feeId,
         updateData,
       );
@@ -110,18 +109,18 @@ export class TransactionFeeController {
   })
   async deleteTransactionFee(@Req() req) {
     const { feeId } = req.body; // Extract feeId from request body
-    const userId = req.user.id; // Get user ID from request
+    // const userId = req.user.id; // Get user ID from request
 
     try {
       const deletedFee = await this.transactionFeeService.deleteTransactionFee(
         feeId,
-        userId,
+        // userId,
       );
-      
+
       if (!deletedFee) {
         throw new NotFoundException('Transaction fee not found');
       }
-      
+
       return deletedFee;
     } catch (error) {
       throw new BadRequestException(error.message);

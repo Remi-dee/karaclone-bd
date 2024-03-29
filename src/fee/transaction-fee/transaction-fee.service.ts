@@ -23,11 +23,11 @@ export class TransactionFeeService {
   }
 
   async createTransactionFee(
-    userId: ObjectId,
+    // userId: ObjectId,
     transactionFeeData: CreateTransactionFeeDTO,
   ): Promise<TransactionFee> {
     // Check if the user is an admin
-    await this.checkAdminPermission(userId);
+    // await this.checkAdminPermission(userId);
 
     // Create the transaction fee
     const createdTransactionFee =
@@ -38,12 +38,12 @@ export class TransactionFeeService {
   }
 
   async updateTransactionFee(
-    userId: ObjectId,
+    // userId: ObjectId,
     feeId: ObjectId,
     updateData: UpdateTransactionFeeDTO,
   ): Promise<TransactionFee> {
     // Check if the user is an admin
-    await this.checkAdminPermission(userId);
+    // await this.checkAdminPermission(userId);
 
     // Find the transaction fee by ID
     const existingFee = await this.transactionFeeModel.findById(feeId).exec();
@@ -61,11 +61,11 @@ export class TransactionFeeService {
   }
 
   async deleteTransactionFee(
-    userId: ObjectId,
+    // userId: ObjectId,
     feeId: ObjectId,
   ): Promise<boolean> {
     // Check if the user is an admin
-    await this.checkAdminPermission(userId);
+    // await this.checkAdminPermission(userId);
 
     // Find the transaction fee by ID and delete it
     const result = await this.transactionFeeModel
