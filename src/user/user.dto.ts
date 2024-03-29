@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsEmail, Matches } from 'class-validator';
-import { E_USER_TYPE } from './user.enum';
+import { E_USER_ROLE, E_USER_TYPE } from './user.enum';
 import { REGEX, MESSAGES } from '../app.util';
 import { User } from './user.schema';
 
@@ -11,6 +11,7 @@ export interface IUserDetails {
   phone: string;
   gender: string;
   account_type: E_USER_TYPE;
+  role: E_USER_ROLE;
   business_name: string;
   business_address: string;
   business_email: string;
@@ -54,6 +55,10 @@ export class RegisterUserDTO {
   @ApiProperty({ description: 'Account type of user' })
   @IsNotEmpty({ message: 'Account type is required' })
   readonly account_type: E_USER_TYPE;
+
+  @ApiProperty({ description: 'User role' })
+  @IsNotEmpty({ message: 'User role is required' })
+  readonly role: E_USER_ROLE;
 
   @ApiProperty({ description: 'Email of user' })
   @IsNotEmpty({ message: 'Email is required' })

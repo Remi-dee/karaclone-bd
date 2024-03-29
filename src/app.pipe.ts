@@ -1,13 +1,21 @@
+import { Injectable, PipeTransform, BadRequestException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
-import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 
 @Injectable()
 export class ParseObjectIdPipe implements PipeTransform<any, ObjectId> {
   public transform(value: any): ObjectId {
     try {
-      return ObjectId.createFromHexString(value);
+      if (typeof value === 'string') {
+        return ObjectId.createFromHexString(value);
+      } else if (Buffer.isBuffer(value)) {
+        // Convert Buffer to hexadecimal string and create ObjectId
+        const hexString = value.toString('hex');
+        return ObjectId.createFromHexString(hexString);
+      } else {
+        throw new BadRequestException('Invalid ID format');
+      }
     } catch (error) {
-      throw new BadRequestException('Wrong Id provided');
+      throw new BadRequestException('Invalid ID');
     }
   }
 }

@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument } from 'mongoose';
 import { BaseSchema } from './../app.schema';
-import { E_USER_TYPE } from './user.enum';
+import { E_USER_ROLE, E_USER_TYPE } from './user.enum';
 import { Wallet } from '../wallet/wallet.schema';
 import { ObjectId } from 'mongodb';
 
@@ -25,7 +25,11 @@ export class User extends BaseSchema {
   @Prop({ required: false })
   phone: string;
 
-  @ApiProperty({ example: 'Individual', description: 'Role of user' })
+  @ApiProperty({ example: 'user', description: 'Role of user' })
+  @Prop({ required: true, default: E_USER_ROLE.USER })
+  role: E_USER_ROLE;
+
+  @ApiProperty({ example: 'Individual', description: 'User account type' })
   @Prop({ default: E_USER_TYPE.INDIVIDUAL })
   account_type: E_USER_TYPE;
 
