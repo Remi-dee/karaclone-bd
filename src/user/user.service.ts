@@ -24,6 +24,7 @@ export class UserService {
       phone: user.phone,
       gender: user.gender,
       account_type: user.account_type,
+      role: user.role,
       business_address: user.business_address,
       business_email: user.business_email,
       business_name: user.business_name,

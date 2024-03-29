@@ -44,7 +44,6 @@ export class StellarService {
 
     try {
       const result = await server.submitTransaction(transaction);
-      console.log('Success! Results:', result);
       return result;
     } catch (error) {
       console.error('Something went wrong!', error);
