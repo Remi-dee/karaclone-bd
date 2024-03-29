@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { TransactionModule } from '../transaction/transaction.module';
+import { currencyPairModule } from 'src/currencyPair/currency-pair.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TransactionModule } from '../transaction/transaction.module';
       signOptions: { expiresIn: '1d' },
     }),
     forwardRef(() => TransactionModule),
+    forwardRef(() => currencyPairModule),
   ],
   controllers: [UserController],
   providers: [UserService],
