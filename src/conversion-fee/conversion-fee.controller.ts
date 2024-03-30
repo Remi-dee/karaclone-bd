@@ -14,8 +14,10 @@ import {
 import { ConversionFeeService } from './conversion-fee.service';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiOperation,
   ApiResponse,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {
@@ -26,10 +28,12 @@ import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
 import { ObjectId } from 'mongoose';
 
 @Controller('conversion-fee')
+@ApiTags('Conversion fee')
+@ApiBearerAuth('Authorization')
 @UseGuards(JwtAuthGuard)
 export class ConversionFeeController {
   constructor(private conversionFeeService: ConversionFeeService) {}
-  @Get('get-all-conversion-fee')
+  @Get('get-all')
   @ApiOperation({
     summary: 'Get all conversion fees',
   })
@@ -47,7 +51,7 @@ export class ConversionFeeController {
     return this.conversionFeeService.findAll();
   }
 
-  @Post('create-conversion-fee')
+  @Post('create')
   @ApiOperation({ summary: 'Create a conversion fee' })
   @ApiResponse({
     status: 201,
@@ -62,13 +66,10 @@ export class ConversionFeeController {
   ) {
     const id = req.user.id;
 
-    return this.conversionFeeService.createConversionFee(
-      id,
-      conversionFeeDTO,
-    );
+    return this.conversionFeeService.createConversionFee(id, conversionFeeDTO);
   }
 
-  @Put('update-conversion-fee/:feeId')
+  @Put('update/:feeId')
   @ApiOperation({ summary: 'Update a conversion fee' })
   @ApiResponse({
     status: 200,
@@ -101,7 +102,7 @@ export class ConversionFeeController {
     }
   }
 
-  @Delete('delete-conversion-fee/:feeId')
+  @Delete('delete/:feeId')
   @ApiOperation({ summary: 'Delete a conversion fee' })
   @ApiResponse({
     status: 200,

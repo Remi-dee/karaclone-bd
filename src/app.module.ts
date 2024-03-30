@@ -12,8 +12,8 @@ import { PaystackModule } from './paystack/paystack.module';
 import { StellarModule } from './stellar/stellar.module';
 import configuration from './config/configuration';
 import { currencyPairModule } from './currencyPair/currency-pair.module';
-import { TransactionFeeModule } from './fee/transaction-fee/transaction-fee.module';
-import { ConversionFeeModule } from './fee/conversion-fee/conversion-fee.module';
+import { ConversionFeeModule } from './conversion-fee/conversion-fee.module';
+import { TransactionFeeModule } from './transaction-fee/transaction-fee.module';
 
 
 @Module({

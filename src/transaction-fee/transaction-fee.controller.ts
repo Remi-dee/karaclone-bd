@@ -14,8 +14,10 @@ import {
 import { TransactionFeeService } from './transaction-fee.service';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiOperation,
   ApiResponse,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {
@@ -26,10 +28,12 @@ import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
 import { ObjectId } from 'mongoose';
 
 @Controller('transaction-fee')
+@ApiTags('Transaction fee')
+@ApiBearerAuth('Authorization')
 @UseGuards(JwtAuthGuard)
 export class TransactionFeeController {
   constructor(private transactionFeeService: TransactionFeeService) {}
-  @Get('get-all-transaction-fee')
+  @Get('get-all')
   @ApiOperation({
     summary: 'Get all transaction fees',
   })
@@ -47,7 +51,7 @@ export class TransactionFeeController {
     return this.transactionFeeService.findAll();
   }
 
-  @Post('create-transaction-fee')
+  @Post('create')
   @ApiOperation({ summary: 'Create a transaction fee' })
   @ApiResponse({
     status: 201,
@@ -68,7 +72,7 @@ export class TransactionFeeController {
     );
   }
 
-  @Put('update-transaction-fee/:feeId')
+  @Put('update/:feeId')
   @ApiOperation({ summary: 'Update a transaction fee' })
   @ApiResponse({
     status: 200,
@@ -101,7 +105,7 @@ export class TransactionFeeController {
     }
   }
 
-  @Delete('delete-transaction-fee/:feeId')
+  @Delete('delete/:feeId')
   @ApiOperation({ summary: 'Delete a transaction fee' })
   @ApiResponse({
     status: 200,
