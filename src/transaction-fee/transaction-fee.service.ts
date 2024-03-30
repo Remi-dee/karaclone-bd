@@ -10,6 +10,7 @@ import {
   UpdateTransactionFeeDTO,
 } from './transaction-fee.dto';
 import { User, UserDocument } from 'src/user/user.schema';
+import ErrorHandler from 'src/utils/ErrorHandler';
 
 @Injectable()
 export class TransactionFeeService {
@@ -25,13 +26,13 @@ export class TransactionFeeService {
   async createTransactionFee(
     userId: ObjectId,
     transactionFeeData: CreateTransactionFeeDTO,
-  ): Promise<TransactionFee> {
+  ): Promise<TransactionFee | any> {
     await this.checkAdminPermission(userId);
 
     const createdTransactionFee =
       await this.transactionFeeModel.create(transactionFeeData);
 
-    return createdTransactionFee;
+    return { message: 'Successfully Created', createdTransactionFee };
   }
 
   async updateTransactionFee(
@@ -53,23 +54,25 @@ export class TransactionFeeService {
     return updatedFee;
   }
 
-  async deleteTransactionFee(
-    userId: ObjectId,
-    feeId: ObjectId,
-  ): Promise<boolean> {
+  async deleteTransactionFee(feeId: ObjectId, userId: ObjectId): Promise<any> {
     await this.checkAdminPermission(userId);
 
-    const result = await this.transactionFeeModel
-      .deleteOne({ _id: feeId })
+    const transactionFee = await this.transactionFeeModel
+      .findById(feeId)
       .exec();
 
-    if (result.deletedCount !== 0) {
-      return true;
-    } else {
-      throw new Error('Transaction fee not found');
+    if (!transactionFee) {
+      throw new ErrorHandler('Failed to fetch updated transaction fee', 500);
     }
-  }
 
+    const deletedDocument = await this.transactionFeeModel.findByIdAndDelete(
+      transactionFee._id,
+    );
+
+    if (!deletedDocument) {
+      throw new ErrorHandler('Transaction fee not found', 404);
+    } else return { message: 'Successfully Deleted', success: true };
+  }
   private async checkAdminPermission(userId: ObjectId): Promise<void> {
     const user = await this.userModel.findById(userId).exec();
 

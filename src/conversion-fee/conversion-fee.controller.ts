@@ -16,6 +16,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -69,8 +70,14 @@ export class ConversionFeeController {
     return this.conversionFeeService.createConversionFee(id, conversionFeeDTO);
   }
 
-  @Put('update/:feeId')
+  @Put('update/:id')
   @ApiOperation({ summary: 'Update a conversion fee' })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the conversion fee',
+    type: 'string',
+    required: true,
+  })
   @ApiResponse({
     status: 200,
     description: 'Conversion fee updated successfully',
@@ -79,7 +86,7 @@ export class ConversionFeeController {
     description: 'Failed to update the conversion fee',
   })
   async updateConversionFee(
-    @Param('feeId') feeId: ObjectId,
+    @Param('id') feeId: ObjectId,
     @Body() updateData: UpdateConversionFeeDTO,
     @Req() req: any,
   ) {
@@ -96,14 +103,20 @@ export class ConversionFeeController {
         throw new NotFoundException('Conversion fee not found');
       }
 
-      return updatedFee;
+      return { message: 'Successfully Updated', updatedFee };
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  @Delete('delete/:feeId')
+  @Delete('delete/:id')
   @ApiOperation({ summary: 'Delete a conversion fee' })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the conversion fee',
+    type: 'string',
+    required: true,
+  })
   @ApiResponse({
     status: 200,
     description: 'Conversion fee deleted successfully',
@@ -111,9 +124,10 @@ export class ConversionFeeController {
   @ApiBadRequestResponse({
     description: 'Failed to delete the conversion fee',
   })
-  async deleteConversionFee(@Param('feeId') feeId: ObjectId, @Req() req) {
+  async deleteConversionFee(@Param('id') feeId: ObjectId, @Req() req: any) {
     const userId = req.user.id;
 
+    console.log('This is ' + feeId);
     try {
       const deletedFee = await this.conversionFeeService.deleteConversionFee(
         feeId,

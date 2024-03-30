@@ -16,6 +16,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -72,8 +73,14 @@ export class TransactionFeeController {
     );
   }
 
-  @Put('update/:feeId')
+  @Put('update/:id')
   @ApiOperation({ summary: 'Update a transaction fee' })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the conversion fee',
+    type: 'string',
+    required: true,
+  })
   @ApiResponse({
     status: 200,
     description: 'Transaction fee updated successfully',
@@ -82,7 +89,7 @@ export class TransactionFeeController {
     description: 'Failed to update the transaction fee',
   })
   async updateTransactionFee(
-    @Param('feeId') feeId: ObjectId,
+    @Param('id') feeId: ObjectId,
     @Body() updateData: UpdateTransactionFeeDTO,
     @Req() req: any,
   ) {
@@ -99,14 +106,20 @@ export class TransactionFeeController {
         throw new NotFoundException('Transaction fee not found');
       }
 
-      return updatedFee;
+      return { message: 'Successfully Updated', updatedFee };
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  @Delete('delete/:feeId')
+  @Delete('delete/:id')
   @ApiOperation({ summary: 'Delete a transaction fee' })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the transaction fee',
+    type: 'string',
+    required: true,
+  })
   @ApiResponse({
     status: 200,
     description: 'Transaction fee deleted successfully',
@@ -114,7 +127,7 @@ export class TransactionFeeController {
   @ApiBadRequestResponse({
     description: 'Failed to delete the transaction fee',
   })
-  async deleteTransactionFee(@Param('feeId') feeId: ObjectId, @Req() req) {
+  async deleteTransactionFee(@Param('id') feeId: ObjectId, @Req() req: any) {
     const userId = req.user.id;
 
     try {
