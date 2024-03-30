@@ -5,10 +5,11 @@ import {
   Delete,
   Get,
   NotFoundException,
+  Param,
   Post,
   Put,
   Req,
-  Res,
+  UseGuards,
 } from '@nestjs/common';
 import { TransactionFeeService } from './transaction-fee.service';
 import {
@@ -21,8 +22,11 @@ import {
   CreateTransactionFeeDTO,
   UpdateTransactionFeeDTO,
 } from './transaction-fee.dto';
+import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
+import { ObjectId } from 'mongoose';
 
 @Controller('transaction-fee')
+@UseGuards(JwtAuthGuard)
 export class TransactionFeeController {
   constructor(private transactionFeeService: TransactionFeeService) {}
   @Get('get-all-transaction-fee')
@@ -54,18 +58,17 @@ export class TransactionFeeController {
   })
   async createTransactionFee(
     @Body() transactionFeeDTO: CreateTransactionFeeDTO,
-    // @Res() res,
-    // @Req() req,
+    @Req() req,
   ) {
-    // const id = req.user.id;
+    const id = req.user.id;
 
     return this.transactionFeeService.createTransactionFee(
-      //   id,
+      id,
       transactionFeeDTO,
     );
   }
 
-  @Put('update-transaction-fee')
+  @Put('update-transaction-fee/:feeId')
   @ApiOperation({ summary: 'Update a transaction fee' })
   @ApiResponse({
     status: 200,
@@ -75,15 +78,15 @@ export class TransactionFeeController {
     description: 'Failed to update the transaction fee',
   })
   async updateTransactionFee(
+    @Param('feeId') feeId: ObjectId,
     @Body() updateData: UpdateTransactionFeeDTO,
-    // @Req() req,
+    @Req() req: any,
   ) {
-    const feeId = updateData.feeId;
-    // const userId = req.user.id;
+    const userId = req.user.id;
 
     try {
       const updatedFee = await this.transactionFeeService.updateTransactionFee(
-        // userId,
+        userId,
         feeId,
         updateData,
       );
@@ -98,7 +101,7 @@ export class TransactionFeeController {
     }
   }
 
-  @Delete('delete-transaction-fee')
+  @Delete('delete-transaction-fee/:feeId')
   @ApiOperation({ summary: 'Delete a transaction fee' })
   @ApiResponse({
     status: 200,
@@ -107,14 +110,13 @@ export class TransactionFeeController {
   @ApiBadRequestResponse({
     description: 'Failed to delete the transaction fee',
   })
-  async deleteTransactionFee(@Req() req) {
-    const { feeId } = req.body; // Extract feeId from request body
-    // const userId = req.user.id; // Get user ID from request
+  async deleteTransactionFee(@Param('feeId') feeId: ObjectId, @Req() req) {
+    const userId = req.user.id;
 
     try {
       const deletedFee = await this.transactionFeeService.deleteTransactionFee(
         feeId,
-        // userId,
+        userId,
       );
 
       if (!deletedFee) {

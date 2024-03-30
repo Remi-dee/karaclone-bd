@@ -8,8 +8,11 @@ import {
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/user/user.schema';
 
+import { AuthenticationModule } from 'src/authentication/authentication.module';
+
 @Module({
   imports: [
+    AuthenticationModule,
     MongooseModule.forFeature([
       { name: TransactionFee.name, schema: TransactionFeeSchema },
     ]),
