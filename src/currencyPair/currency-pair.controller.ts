@@ -12,7 +12,6 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-  Patch,
   Put,
 } from '@nestjs/common';
 import { CurrencyPairService } from './currency-pair.service';
