@@ -5,10 +5,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ErrorMiddleware } from './middleware/Error';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { v2 as cloudinary } from 'cloudinary';
-import {config as dotenvConfig} from "dotenv"
+import { config as dotenvConfig } from 'dotenv';
 // require('dotenv').config();
-dotenvConfig()
+dotenvConfig();
 process.env.gNODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+const port = process.env.PORT;
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -44,6 +46,6 @@ async function bootstrap() {
     api_secret: process.env.CLOUD_SECRET_KEY,
   });
 
-  await app.listen(process.env.PORT);
+  app.listen(port, () => console.log(`Server started on port ${port}`));
 }
 bootstrap();
