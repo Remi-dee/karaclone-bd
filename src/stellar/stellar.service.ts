@@ -1,56 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import StellarSdk from 'stellar-sdk';
+import StellarSdk, { Server, Keypair } from 'stellar-sdk';
 
 @Injectable()
 export class StellarService {
-  async sendPayment(): Promise<any> {
-    const server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
-    const sourceKeys = StellarSdk.Keypair.fromSecret(
-      process.env.STELLAR_SECRET_KEY,
-    );
-    const destinationId =
-      'GA2C5RFPE6GCKMY3US5PAB6UZLKIGSPIUKSLRB6Q723BM2OARMDUYEJ5';
+  private readonly server = new Server('https://horizon-testnet.stellar.org');
 
-    let transaction;
+  async createAccountWithFriendbot(publicKey: string) {
+    const friendbotUrl = 'https://friendbot.stellar.org'; // Replace with actual URL
 
     try {
-      await server.loadAccount(destinationId);
-    } catch (error) {
-      if (error instanceof StellarSdk.NotFoundError) {
-        throw new Error('The destination account does not exist!');
-      } else {
-        throw error;
+      const response = await fetch(`${friendbotUrl}?addr=${publicKey}`);
+      const data = await response.json();
+
+      if (data.hasOwnProperty('message')) {
+        throw new Error(data.message); // Handle Friendbot error
       }
+
+      console.log('Account created successfully!');
+      return;
+    } catch (error) {
+      console.error('Error creating account:', error);
+      throw error; // Re-throw for handling in the controller
     }
+  }
 
-    const sourceAccount = await server.loadAccount(sourceKeys.publicKey());
-
-    transaction = new StellarSdk.TransactionBuilder(sourceAccount, {
-      fee: StellarSdk.BASE_FEE,
-      networkPassphrase: StellarSdk.Networks.TESTNET,
-    })
-      .addOperation(
-        StellarSdk.Operation.payment({
-          destination: destinationId,
-          asset: StellarSdk.Asset.native(),
-          amount: '10',
-        }),
-      )
-      .addMemo(StellarSdk.Memo.text('Test Transaction'))
-      .setTimeout(180)
-      .build();
-
-    transaction.sign(sourceKeys);
+  async sendXlm(sourceSecret: string, destinationId: string, amount: number) {
+    const sourceKeys = Keypair.fromSecret(sourceSecret);
 
     try {
-      const result = await server.submitTransaction(transaction);
-      return result;
+      // Check if destination account exists
+      await this.server.loadAccount(destinationId).catch(async (error) => {
+        if (error instanceof StellarSdk.NotFoundError) {
+          console.log(
+            'Destination account not found. Creating with Friendbot...',
+          );
+          await this.createAccountWithFriendbot(destinationId); // Call your Friendbot function
+        } else {
+          throw error;
+        }
+      });
+
+      // Load source account information (after potential account creation)
+      const sourceAccount = await this.server.loadAccount(
+        sourceKeys.publicKey(),
+      );
+
+      // Rest of the transaction building and submission logic...
     } catch (error) {
       console.error('Something went wrong!', error);
-      // If the result is unknown (no response body, timeout etc.) we simply resubmit
-      // already built transaction:
-      // server.submitTransaction(transaction);
-      throw error;
+      throw error; // Re-throw error for handling in the controller
     }
   }
 }

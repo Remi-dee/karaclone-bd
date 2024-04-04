@@ -56,7 +56,7 @@ export class ConversionFeeService {
 
   async deleteConversionFee(feeId: ObjectId, userId: ObjectId): Promise<any> {
     await this.checkAdminPermission(userId);
-    console.log('This is ' + feeId);
+
     const conversionFee = await this.conversionFeeModel.findById(feeId).exec();
 
     if (!conversionFee) {
