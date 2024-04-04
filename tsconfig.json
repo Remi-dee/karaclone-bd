@@ -21,7 +21,7 @@
   "assets": [
     {
       "include": "src/mail/templates/**/*",
-      "output": "/-mail/templates"
+      "output": "/mail/templates"
     }
   ]
 }

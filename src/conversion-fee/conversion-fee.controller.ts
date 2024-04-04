@@ -34,6 +34,7 @@ import { ObjectId } from 'mongoose';
 @UseGuards(JwtAuthGuard)
 export class ConversionFeeController {
   constructor(private conversionFeeService: ConversionFeeService) {}
+
   @Get('get-all')
   @ApiOperation({
     summary: 'Get all conversion fees',
@@ -126,8 +127,6 @@ export class ConversionFeeController {
   })
   async deleteConversionFee(@Param('id') feeId: ObjectId, @Req() req: any) {
     const userId = req.user.id;
-
-    console.log('This is ' + feeId);
     try {
       const deletedFee = await this.conversionFeeService.deleteConversionFee(
         feeId,
