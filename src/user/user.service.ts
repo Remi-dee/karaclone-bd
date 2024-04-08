@@ -35,8 +35,10 @@ export class UserService {
   }
 
   async findOneByEmail(email: string): Promise<User | undefined> {
-    if (email.includes('@'))
+    if (email && email.includes('@')) {
+      // Add a check for email existence
       return await this.userModel.findOne({ email: email });
+    }
   }
 
   async findOneById(id: ObjectId): Promise<User | null> {

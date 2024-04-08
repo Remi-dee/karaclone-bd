@@ -39,6 +39,14 @@ export class KYC extends BaseSchema {
     url: string;
   };
 
+  @ApiProperty({ example: 'true', description: 'Country of the user' })
+  @Prop({ required: true, default: false })
+  is_politician: boolean;
+
+  @ApiProperty({ example: 'Nigeria', description: 'Country of the user' })
+  @Prop({ required: true, default: false })
+  is_criminal_convict: boolean;
+
   @Prop({ type: ObjectId, ref: 'User' })
   user: string;
 }
