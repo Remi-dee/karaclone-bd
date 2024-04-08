@@ -24,4 +24,10 @@ export class CreateKYCDTO {
 
   @ApiProperty({ description: 'Currency pair exchange rate' })
   cac_document: string;
+
+  @ApiProperty({ description: 'Currency pair exchange rate' })
+  is_politician: boolean;
+
+  @ApiProperty({ description: 'Currency pair exchange rate' })
+  is_criminal_convict: boolean;
 }
