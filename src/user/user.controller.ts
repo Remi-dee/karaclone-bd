@@ -115,4 +115,27 @@ export class UserController {
     // Send the QR code to the client
     res.status(200).json({ verifyCode });
   }
+
+  @Get('logout')
+  @ApiOperation({
+    summary: 'Logout a user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Logout a user',
+  })
+  @ApiBadRequestResponse({
+    description: 'Login failed due to bad request',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'UnauthorisedException: Invalid credentials',
+  })
+  async signout(@Req() req, @Res() response) {
+    req.headers.authorization = null;
+
+    return response.status(201).json({
+      success: true,
+      message: `Logout successfully!`,
+    });
+  }
 }

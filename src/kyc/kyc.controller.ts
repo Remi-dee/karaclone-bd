@@ -33,7 +33,7 @@ import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
 export class KycController {
   constructor(private readonly kycservice: KycService) {}
 
-  @Post('create')
+  @Post()
   @ApiOperation({
     summary: 'Create kyc for user',
   })
@@ -50,11 +50,12 @@ export class KycController {
     status: 401,
     description: 'UnauthorisedException: Invalid credentials',
   })
-  async createCurrencyPair(@Res() res, @Req() req, @Body() data: CreateKYCDTO) {
+  async createKyc(@Res() res, @Req() req, @Body() data: CreateKYCDTO) {
     try {
+      console.log(data);
       const id = req.user.id;
 
-      const result = await this.kycservice.createKYC(data, id);
+      const result = await this.kycservice.createKYCService(data, id);
 
       res.status(201).json({
         message: 'KYC is saved successfully',
