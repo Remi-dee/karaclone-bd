@@ -52,7 +52,6 @@ export class KycController {
   })
   async createKyc(@Res() res, @Req() req, @Body() data: CreateKYCDTO) {
     try {
-      console.log(data);
       const id = req.user.id;
 
       const result = await this.kycservice.createKYCService(data, id);
