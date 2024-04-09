@@ -5,14 +5,20 @@ import { v4 as uuidv4 } from 'uuid';
 import { KYC, KYCDocument } from './kyc.schema';
 import * as cloudinary from 'cloudinary';
 import { CreateKYCDTO } from './kyc.dto';
+import { User, UserDocument } from 'src/user/user.schema';
+import * as argon from 'argon2';
 
 @Injectable()
 export class KycService {
   constructor(
     @InjectModel(KYC.name) private readonly kycModel: Model<KYCDocument>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async createKYC(createKYCDTO: CreateKYCDTO, userId: string): Promise<KYC> {
+  async createKYCService(
+    createKYCDTO: CreateKYCDTO,
+    userId: string,
+  ): Promise<KYC> {
     const {
       country,
       id_document_type,
@@ -20,6 +26,9 @@ export class KycService {
       address_document_type,
       address_document,
       cac_document,
+      bvn,
+      is_politician,
+      is_criminal_convict,
     } = createKYCDTO;
 
     // Define upload function
@@ -63,6 +72,8 @@ export class KycService {
     // Wait for all uploads to finish
     const uploadedDocuments = await Promise.all(uploadPromises);
 
+    const hashedBVN = await argon.hash(bvn);
+
     // Create KYC object with uploaded document details
     const newKYC = new this.kycModel({
       user: userId,
@@ -78,6 +89,13 @@ export class KycService {
       cac_document: uploadedDocuments.find(
         (doc) => doc.documentType === 'cac_document',
       ),
+      bvn: hashedBVN,
+      is_politician,
+      is_criminal_convict,
+    });
+
+    await this.userModel.findByIdAndUpdate(userId, {
+      is_completed_kyc: true,
     });
 
     // Save KYC record

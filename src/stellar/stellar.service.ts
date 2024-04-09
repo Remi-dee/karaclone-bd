@@ -34,7 +34,7 @@ export class StellarService {
           console.log(
             'Destination account not found. Creating with Friendbot...',
           );
-          await this.createAccountWithFriendbot(destinationId); // Call your Friendbot function
+          await this.createAccountWithFriendbot(destinationId);
         } else {
           throw error;
         }

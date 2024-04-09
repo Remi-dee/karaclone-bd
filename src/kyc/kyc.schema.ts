@@ -13,6 +13,13 @@ export class KYC extends BaseSchema {
   @Prop({ required: true })
   country: string;
 
+  @ApiProperty({
+    example: '22236746758',
+    description: 'User bank verification number',
+  })
+  @Prop({ required: true })
+  bvn: string;
+
   @ApiProperty({ example: 'user', description: 'Role of user' })
   @Prop({ required: true })
   id_document_type: E_ID_DOC_TYPE;

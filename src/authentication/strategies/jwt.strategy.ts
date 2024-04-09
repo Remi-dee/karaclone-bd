@@ -18,6 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(req: Request, payload: any) {
     Logger.log('payload', payload);
     const user = await this.userService.findOneByEmail(payload.user.email);
+    //const user = await this.userService.findOneByEmail(payload.email);
 
     Logger.log('user', user.name);
 
