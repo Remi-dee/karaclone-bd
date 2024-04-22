@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsEmail, Matches } from 'class-validator';
+import { REGEX, MESSAGES } from '../app.util';
+import { E_USER_ROLE, E_USER_TYPE } from '../user/user.enum';
 
 export class IActivationToken {
   token: string;
@@ -15,4 +17,64 @@ export class IActivationRequest {
   @ApiProperty({ description: 'Name of user' })
   @IsNotEmpty({ message: 'Name is required' })
   activation_code: string;
+}
+
+export class RegisterUserDTO {
+  @ApiProperty({ description: 'Name of user' })
+  @IsNotEmpty({ message: 'Name is required' })
+  readonly name: string;
+
+  @ApiProperty({ description: 'Gender of user' })
+  @IsNotEmpty({ message: 'Gender is required' })
+  readonly gender: string;
+
+  @ApiProperty({ description: 'Account type of user' })
+  @IsNotEmpty({ message: 'Account type is required' })
+  readonly account_type: E_USER_TYPE;
+
+  @ApiProperty({ description: 'User role' })
+  @IsNotEmpty({ message: 'User role is required' })
+  readonly role: E_USER_ROLE;
+
+  @ApiProperty({ description: 'Email of user' })
+  @IsNotEmpty({ message: 'Email is required' })
+  @IsEmail()
+  readonly email: string;
+
+  @ApiProperty({ description: 'Phone number of user' })
+  @IsNotEmpty({ message: 'Phone number is required' })
+  readonly phone: string;
+
+  @ApiProperty({ description: 'Business number of user' })
+  readonly business_name: string;
+
+  @ApiProperty({ description: 'Phone number of user' })
+  readonly business_address: string;
+
+  @ApiProperty({ description: 'Phone number of user' })
+  readonly business_email: string;
+
+  @ApiProperty({ description: 'Phone number of user' })
+  readonly business_line: string;
+
+  @ApiProperty({ description: 'User Password' })
+  @IsNotEmpty({ message: 'Password is required' })
+  @Matches(REGEX.PASSWORD_RULE, {
+    message: MESSAGES.PASSWORD_RULE_MESSAGE,
+  })
+  readonly password: string;
+}
+
+export class LoginUserDTO {
+  @ApiProperty({ description: 'Email of user' })
+  @IsNotEmpty({ message: 'Email is required' })
+  @IsEmail()
+  readonly email: string;
+
+  @ApiProperty({ description: 'User Password' })
+  @IsNotEmpty({ message: 'Password is required' })
+  @Matches(REGEX.PASSWORD_RULE, {
+    message: MESSAGES.PASSWORD_RULE_MESSAGE,
+  })
+  readonly password: string;
 }

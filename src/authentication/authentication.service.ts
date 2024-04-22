@@ -4,15 +4,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../user/user.schema';
 import { UserService } from '../user/user.service';
-import {
-  IAuthenticationResponse,
-  LoginUserDTO,
-  RegisterUserDTO,
-} from '../user/user.dto';
+import { IAuthenticationResponse } from '../user/user.dto';
 import * as argon from 'argon2';
 import ErrorHandler from '../utils/ErrorHandler';
 import { EmailService } from '../mail/mail.service';
-import { IActivationRequest, IActivationToken } from './authentication.dto';
+import {
+  IActivationRequest,
+  IActivationToken,
+  LoginUserDTO,
+  RegisterUserDTO,
+} from './authentication.dto';
 import * as speakeasy from 'speakeasy';
 import { Keypair } from 'stellar-sdk';
 

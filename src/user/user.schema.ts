@@ -55,7 +55,7 @@ export class User extends BaseSchema {
   business_line: string;
 
   @Prop({ required: false, type: Object })
-  cac_document: {
+  user_id_card: {
     public_id: string;
     url: string;
   };

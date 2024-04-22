@@ -7,5 +7,5 @@ export enum E_USER_TYPE {
 export enum E_USER_ROLE {
   SUPERADMIN = 'superadmin',
   ADMIN = 'admin',
-  USER = 'user',
+  USER = 'fxkarauser',
 }
