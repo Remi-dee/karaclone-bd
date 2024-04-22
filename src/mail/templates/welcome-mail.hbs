@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>FXKaraSell Welcome Email</title>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <style type='text/css'>
+      /* Base */ body { margin: 0; padding: 0; min-width: 100%; font-family:
+      Arial, sans-serif; font-size: 16px; line-height: 1.5; background-color:
+      #fafafa; color: #222222; } a { color: #000; text-decoration: none; } h1 {
+      font-size: 24px; font-weight: 700; line-height: 1.25; margin-top: 0;
+      margin-bottom: 15px; text-align: center; } p { margin-top: 0;
+      margin-bottom: 24px; } table td { vertical-align: top; } /* Layout */
+      .email-wrapper { max-width: 600px; margin: 0 auto; } .email-header {
+      background-color: #0070f3; padding: 24px; color: #ffffff; } .email-body {
+      padding: 24px; background-color: #ffffff; } .email-footer {
+      background-color: #f6f6f6; padding: 24px; } /* Buttons */ .button {
+      display: inline-block; background-color: #0070f3; color: #ffffff;
+      font-size: 16px; font-weight: 700; text-align: center; text-decoration:
+      none; padding: 12px 24px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <div class='email-wrapper'>
+      <div class='email-header'>
+        <h1>Welcome to the best trading platform</h1>
+      </div>
+      <div class='email-body'>
+        <p>Dear {{user.name}},</p>
+        <p>
+          We're thrilled to have you join our community of traders. Your journey
+          toward successful trading starts here. To get started, please log in
+          using the password
+          {{user.password}}
+          you'll have the opportunity to explore our platform, access valuable
+          resources, and begin trading in the global forex market.
+        </p>
+
+        <p>
+          For security purposes, we recommend resetting your password after your
+          initial login. This ensures that you have full control over your
+          account and can trade with peace of mind. Simply navigate to the
+          'Password Reset' section in your account settings to choose a password
+          that's both secure and memorable to you.
+        </p>
+
+      </div>
+      <div class='email-footer'>
+
+        <p>
+          If you have any questions or need assistance at any point, our support
+          team is here to help. Feel free to reach out to us, and we'll be happy
+          to assist you.
+          <a href='mailto:support@fxkarasell.com'>support@fxkarasell.com</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
