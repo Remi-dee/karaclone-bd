@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
-
 export class CreateConversionFeeDTO {
   @ApiProperty({ description: 'Currency pair' })
   @IsNotEmpty({ message: 'Currency pair is required' })
@@ -13,11 +12,9 @@ export class CreateConversionFeeDTO {
 }
 
 export class UpdateConversionFeeDTO {
-  @ApiProperty({ description: 'Currency pair' })
-  @IsNotEmpty({ message: 'Currency pair is required' })
+  @ApiProperty({ description: 'Currency pair', required: false })
   readonly currency_pair: string;
 
-  @ApiProperty({ description: 'Conversion Fee' })
-  @IsNotEmpty({ message: 'Conversion fee is required' })
+  @ApiProperty({ description: 'Conversion Fee', required: false })
   readonly conversion_fee: string;
 }
