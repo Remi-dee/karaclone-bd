@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CurrencyPair, CurrencyPairDocument } from './currency-pair.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -78,6 +78,22 @@ export class CurrencyPairService {
       throw new ErrorHandler('No currency pair is registered', 404);
 
     return { currencyPairs, count };
+  }
+
+  // get exchange rate
+  async getExchangeRate(
+    baseCurrency: string,
+    quoteCurrency: string,
+  ): Promise<number> {
+    const currencyPair = await this.currencyPairModel
+      .findOne({ base_currency: baseCurrency, quote_currency: quoteCurrency })
+      .exec();
+    if (!currencyPair) {
+      throw new NotFoundException(
+        `Exchange rate not found for ${baseCurrency} to ${quoteCurrency}`,
+      );
+    }
+    return currencyPair.exchange_rate;
   }
 
   // update a currency pair
