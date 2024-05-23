@@ -7,6 +7,8 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  NotFoundException,
+  Param,
   Post,
   Req,
   Res,
@@ -107,5 +109,21 @@ export class TradeController {
   async getAllExceptMine(@Req() req) {
     const userId: ObjectId = req.user.id;
     return await this.tradeService.findAllExceptUser(userId);
+  }
+
+  @Get('get-trade/:tradeId')
+  @ApiOperation({ summary: 'Get trade by Trade ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Trade retrieved successfully',
+  })
+  @ApiBadRequestResponse({ description: 'Failed to get trade' })
+  async getTradeByTradeId(@Param('tradeId') tradeId: string) {
+    try {
+      const trade = await this.tradeService.findTradeByTradeId(tradeId);
+      return trade;
+    } catch (error) {
+      throw new NotFoundException(`Trade with Trade ID ${tradeId} not found`);
+    }
   }
 }

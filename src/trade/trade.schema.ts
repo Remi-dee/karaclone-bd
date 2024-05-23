@@ -34,6 +34,9 @@ export class Trade extends BaseSchema {
   @Prop({ required: true })
   beneficiary_account: string;
 
+  @Prop({ required: true, unique: true })
+  tradeId: string;
+
   @Prop({ type: ObjectId, ref: 'User Id' })
   userId: ObjectId;
 }
