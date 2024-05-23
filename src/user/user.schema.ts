@@ -82,6 +82,12 @@ export class User extends BaseSchema {
 
   @Prop({ type: [{ type: ObjectId, ref: 'Wallet' }] })
   wallets: Wallet[];
+
+  @Prop({ required: false })
+  resetPasswordToken: string;
+
+  @Prop({ required: false })
+  resetPasswordExpires: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

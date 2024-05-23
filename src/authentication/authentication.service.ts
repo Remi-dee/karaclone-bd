@@ -15,6 +15,7 @@ import { EMailService } from '../mail/mail.service';
 import { IActivationRequest, IActivationToken } from './authentication.dto';
 import * as speakeasy from 'speakeasy';
 import { Keypair } from 'stellar-sdk';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthenticationService {
@@ -186,5 +187,46 @@ export class AuthenticationService {
       password: hashedPassword,
       is_verified: true,
     });
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    const user = await this.userModel.findOne({ email: email });
+    if (!user) {
+      throw new ErrorHandler('User not found', 404);
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = await argon.hash(resetToken);
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour from now
+    await user.save();
+
+    const resetUrl = `http://yourfrontend.com/reset-password?token=${resetToken}&email=${email}`;
+    console.log('this is', resetToken);
+    const data = { user: { name: user.name }, resetUrl };
+
+    this.mailService.sendMail({
+      email: user.email,
+      subject: 'Password Reset Request',
+      template: 'reset-password-mail',
+      context: data,
+    });
+  }
+
+  async resetPassword(resetToken: string, newPassword: string): Promise<void> {
+    const user = await this.userModel.findOne({
+      resetPasswordToken: { $exists: true },
+      resetPasswordExpires: { $gt: new Date() },
+    });
+
+    if (!user || !(await argon.verify(user.resetPasswordToken, resetToken))) {
+      throw new ErrorHandler('Invalid or expired password reset token', 400);
+    }
+
+    user.password = await argon.hash(newPassword);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
   }
 }

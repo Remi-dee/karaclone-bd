@@ -16,3 +16,5 @@ export class IActivationRequest {
   @IsNotEmpty({ message: 'Name is required' })
   activation_code: string;
 }
+
+
