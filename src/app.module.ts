@@ -16,6 +16,7 @@ import { ConversionFeeModule } from './conversion-fee/conversion-fee.module';
 import { TransactionFeeModule } from './transaction-fee/transaction-fee.module';
 import { TradeModule } from './trade/trade.module';
 import { CurrencyConversionModule } from './currency-conversion/currency-conversion.module';
+import { KycModule } from './kyc/kyc.module';
 
 
 @Module({
@@ -34,6 +35,7 @@ import { CurrencyConversionModule } from './currency-conversion/currency-convers
     ConversionFeeModule,
     TradeModule,
     CurrencyConversionModule,
+    KycModule,
   ],
   controllers: [AppController],
   providers: [AppService],

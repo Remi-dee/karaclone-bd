@@ -2,10 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { User, UserDocument } from './user.schema';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { IUserDetails, Verify2FADTO } from './user.dto';
+import { CreateUserDTO, IUserDetails, Verify2FADTO } from './user.dto';
 import { ObjectId } from 'mongodb';
 import * as qrcode from 'qrcode';
 import * as speakeasy from 'speakeasy';
+import { generateKey } from '../app.util';
+import ErrorHandler from '../utils/ErrorHandler';
+import { v4 as uuidv4 } from 'uuid';
+import * as cloudinary from 'cloudinary';
+import { EmailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
@@ -14,7 +19,69 @@ export class UserService {
 
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+    private mailService: EmailService,
   ) {}
+
+  // Define upload function
+  async uploadDocumentToCloudinary(
+    document: string,
+  ): Promise<{ public_id: string; url: string }> {
+    const uniquePublicId = uuidv4(); // Generate unique public ID
+
+    const uploadResult = await cloudinary.v2.uploader.upload(document, {
+      public_id: uniquePublicId,
+      folder: 'user_documents',
+      width: 150,
+    });
+
+    return {
+      public_id: uploadResult.public_id,
+      url: uploadResult.url,
+    };
+  }
+
+  async createUserService(createUserDto: CreateUserDTO): Promise<User> {
+    const { name, email, gender, role, user_id_card, password, account_type } =
+      createUserDto;
+
+    let uploadedDocument;
+    if (user_id_card) {
+      uploadedDocument = await this.uploadDocumentToCloudinary(user_id_card);
+    }
+
+    const newUser = new this.userModel({
+      name,
+      email,
+      gender,
+      role,
+      user_id_card: uploadedDocument,
+      password,
+      account_type,
+    });
+
+    const data = { user: { name: newUser.name, password: newUser.password } };
+
+    try {
+      this.mailService.sendMail({
+        email: newUser.email,
+        subject: 'Welcome Email',
+        template: 'welcome-mail',
+        context: data,
+      });
+
+      return await newUser.save();
+    } catch (error: any) {
+      throw new ErrorHandler(error.message, 400);
+    }
+  }
+
+  async generatePasswordService(): Promise<string> {
+    // Generate random user password
+    const generatedPassword = generateKey(6);
+    if (!generatedPassword)
+      throw new ErrorHandler('Error occurred in generating user password', 400);
+    return generatedPassword;
+  }
 
   getUserDetails(user: UserDocument): IUserDetails {
     return {
@@ -35,8 +102,10 @@ export class UserService {
   }
 
   async findOneByEmail(email: string): Promise<User | undefined> {
-    if (email.includes('@'))
+    if (email && email.includes('@')) {
+      // Add a check for email existence
       return await this.userModel.findOne({ email: email });
+    }
   }
 
   async findOneById(id: ObjectId): Promise<User | null> {

@@ -4,8 +4,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ErrorMiddleware } from './middleware/Error';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { v2 as cloudinary } from 'cloudinary';
+import * as cloudinary from 'cloudinary';
 import { config as dotenvConfig } from 'dotenv';
+import * as bodyParser from 'body-parser';
 // require('dotenv').config();
 dotenvConfig();
 process.env.gNODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -18,12 +19,14 @@ async function bootstrap() {
   app.setGlobalPrefix('/api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: '*',
     credentials: true,
   });
 
   app.setViewEngine('hbs');
 
+  app.use(bodyParser.json({ limit: '10mb' }));
+  app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
   app.use(ErrorMiddleware);
 
   const config = new DocumentBuilder()
@@ -40,7 +43,7 @@ async function bootstrap() {
   SwaggerModule.setup('/api/docs', app, document);
 
   // cloudinary config
-  cloudinary.config({
+  cloudinary.v2.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.CLOUD_API_KEY,
     api_secret: process.env.CLOUD_SECRET_KEY,

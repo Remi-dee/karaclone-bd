@@ -2,10 +2,10 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class EMailService {
+export class EmailService {
   constructor(private mailerService: MailerService) {}
 
-  sendMail(options: any): void {
+  sendMail(options: EmailOptions): void {
     const { email, subject, template, context } = options;
 
     this.mailerService.sendMail({

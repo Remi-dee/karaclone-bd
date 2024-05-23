@@ -55,7 +55,7 @@ export class User extends BaseSchema {
   business_line: string;
 
   @Prop({ required: false, type: Object })
-  cac_document: {
+  user_id_card: {
     public_id: string;
     url: string;
   };
@@ -80,6 +80,13 @@ export class User extends BaseSchema {
   @Prop({ default: false })
   is_2FA_enabled: boolean;
 
+  @ApiProperty({
+    example: 'true',
+    description: 'Completed user kyc',
+  })
+  @Prop({ default: false })
+  is_completed_kyc: boolean;
+
   @Prop({ type: [{ type: ObjectId, ref: 'Wallet' }] })
   wallets: Wallet[];
 
@@ -88,6 +95,8 @@ export class User extends BaseSchema {
 
   @Prop({ required: false })
   resetPasswordExpires: Date;
+  @Prop({ type: ObjectId, ref: 'KYC' })
+  kyc: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsNumber, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ObjectId } from 'mongodb';
+import { randomBytes } from 'crypto';
 
 const PASSWORD_RULE =
   /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
@@ -52,4 +53,8 @@ export class IdParam {
   })
   @Type(() => ObjectId)
   id: ObjectId;
+}
+
+export function generateKey(size = 32) {
+  return randomBytes(size).toString('base64');
 }

@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
+  Next,
   Post,
   Req,
   Res,
@@ -14,10 +16,13 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBadRequestResponse,
+  ApiConflictResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
 import { UserService } from './user.service';
-import { Verify2FADTO } from './user.dto';
+import { CreateUserDTO, Verify2FADTO } from './user.dto';
+import { User } from './user.schema';
+import ErrorHandler from '../utils/ErrorHandler';
 
 @ApiBearerAuth('Authorization')
 @ApiTags('User')
@@ -31,14 +36,14 @@ export class UserController {
 
   @Get('me')
   @ApiOperation({
-    summary: 'Enable 2FA for user',
+    summary: 'User profile details',
   })
   @ApiResponse({
     status: 200,
-    description: 'Enable 2FA for user',
+    description: 'Get user details',
   })
   @ApiBadRequestResponse({
-    description: 'Failed to enable 2FA',
+    description: 'Failed to retrieve user details',
   })
   @ApiUnauthorizedResponse({
     description: 'UnauthorisedException: Invalid credentials',
@@ -90,9 +95,9 @@ export class UserController {
   }
 
   @Post('verify-2fa')
-  @ApiOperation({ summary: 'Enable 2FA for user' })
-  @ApiResponse({ status: 200, description: 'Enable 2FA for user' })
-  @ApiBadRequestResponse({ description: 'Failed to enable 2FA' })
+  @ApiOperation({ summary: 'Verify 2FA for user' })
+  @ApiResponse({ status: 200, description: 'Verify 2FA for user' })
+  @ApiBadRequestResponse({ description: 'Failed to verify 2FA' })
   @ApiUnauthorizedResponse({
     description: 'UnauthorisedException: Invalid credentials',
   })
@@ -114,5 +119,106 @@ export class UserController {
 
     // Send the QR code to the client
     res.status(200).json({ verifyCode });
+  }
+
+  @Get('logout')
+  @ApiOperation({
+    summary: 'Logout a user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Logout a user',
+  })
+  @ApiBadRequestResponse({
+    description: 'Login failed due to bad request',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'UnauthorisedException: Invalid credentials',
+  })
+  async signout(@Req() req, @Res() response) {
+    req.headers.authorization = null;
+
+    return response.status(201).json({
+      success: true,
+      message: `Logout successfully!`,
+    });
+  }
+
+  @Get('generate-user-password')
+  @ApiOperation({
+    summary: 'Generate random password for user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Generate random password for user',
+  })
+  @ApiBadRequestResponse({
+    description: 'Failed to generate random password',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'UnauthorisedException: Invalid credentials',
+  })
+  async generateUserPassword(@Res() res, @Req() req) {
+    const id = req.user.id;
+
+    const user = await this.userService.findOneById(id);
+
+    if (user?.role !== 'superadmin') {
+      return res
+        .status(404)
+        .json({ message: 'Login as an admin to perform this task' });
+    }
+
+    const password = await this.userService.generatePasswordService();
+
+    // Send the QR code to the client
+    res.status(200).json({ password });
+  }
+
+  @Post('create')
+  @ApiOperation({ summary: 'Create a user' })
+  @ApiResponse({
+    status: 201,
+    description: 'Create a user account',
+    type: User,
+  })
+  @ApiBadRequestResponse({
+    description: 'Registration failed due to bad request',
+  })
+  @ApiConflictResponse({
+    description: 'Registration failed due to some fields already in use',
+  })
+  async createUser(
+    @Body() data: CreateUserDTO,
+    @Res() response,
+    @Next() next,
+    @Req() req,
+  ) {
+    try {
+      const id = req.user.id;
+
+      const user = await this.userService.findOneById(id);
+
+      if (user?.role !== 'superadmin') {
+        return response
+          .status(404)
+          .json({ message: 'Login as an admin to perform this task' });
+      }
+      const result = await this.userService.createUserService(data);
+
+      return response.status(201).json({
+        success: true,
+        message: `User created successful!`,
+        result,
+      });
+    } catch (error: any) {
+      if (error instanceof ErrorHandler) {
+        return response.status(HttpStatus.NOT_FOUND).json({
+          message: error.message,
+        });
+      } else {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
   }
 }

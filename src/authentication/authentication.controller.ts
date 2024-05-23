@@ -7,16 +7,15 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import {
-  ForgotPasswordDTO,
-  LoginUserDTO,
-  RegisterUserDTO,
-  ResetPasswordDTO,
-} from '../user/user.dto';
+import { ForgotPasswordDTO, ResetPasswordDTO } from '../user/user.dto';
 import { User } from '../user/user.schema';
 import { AuthenticationService } from './authentication.service';
 import ErrorHandler from '../utils/ErrorHandler';
-import { IActivationRequest } from './authentication.dto';
+import {
+  IActivationRequest,
+  LoginUserDTO,
+  RegisterUserDTO,
+} from './authentication.dto';
 import { UserService } from '../user/user.service';
 
 @ApiTags('Authentication')

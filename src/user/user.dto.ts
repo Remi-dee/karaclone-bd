@@ -43,7 +43,13 @@ export class ISignUpResponse {
   readonly token: string;
 }
 
-export class RegisterUserDTO {
+export class Verify2FADTO {
+  @ApiProperty({ description: 'User one-time password' })
+  @IsNotEmpty({ message: 'User one-time password is required' })
+  readonly topt: string;
+}
+
+export class CreateUserDTO {
   @ApiProperty({ description: 'Name of user' })
   @IsNotEmpty({ message: 'Name is required' })
   readonly name: string;
@@ -65,48 +71,16 @@ export class RegisterUserDTO {
   @IsEmail()
   readonly email: string;
 
-  @ApiProperty({ description: 'Phone number of user' })
-  @IsNotEmpty({ message: 'Phone number is required' })
-  readonly phone: string;
-
-  @ApiProperty({ description: 'Business number of user' })
-  readonly business_name: string;
-
-  @ApiProperty({ description: 'Phone number of user' })
-  readonly business_address: string;
-
-  @ApiProperty({ description: 'Phone number of user' })
-  readonly business_email: string;
-
-  @ApiProperty({ description: 'Phone number of user' })
-  readonly business_line: string;
-
   @ApiProperty({ description: 'User Password' })
   @IsNotEmpty({ message: 'Password is required' })
   @Matches(REGEX.PASSWORD_RULE, {
     message: MESSAGES.PASSWORD_RULE_MESSAGE,
   })
   readonly password: string;
-}
 
-export class LoginUserDTO {
-  @ApiProperty({ description: 'Email of user' })
-  @IsNotEmpty({ message: 'Email is required' })
-  @IsEmail()
-  readonly email: string;
-
-  @ApiProperty({ description: 'User Password' })
-  @IsNotEmpty({ message: 'Password is required' })
-  @Matches(REGEX.PASSWORD_RULE, {
-    message: MESSAGES.PASSWORD_RULE_MESSAGE,
-  })
-  readonly password: string;
-}
-
-export class Verify2FADTO {
-  @ApiProperty({ description: 'User one-time password' })
-  @IsNotEmpty({ message: 'User one-time password is required' })
-  readonly topt: string;
+  @ApiProperty({ description: 'ID Document' })
+  @IsNotEmpty({ message: 'ID Document is required' })
+  user_id_card: string;
 }
 
 // user.dto.ts
