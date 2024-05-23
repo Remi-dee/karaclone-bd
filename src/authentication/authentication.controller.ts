@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Post,
-  HttpStatus,
-  Next,
-  Res,
-  Get,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Post, HttpStatus, Next, Res } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
@@ -16,6 +7,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { ForgotPasswordDTO, ResetPasswordDTO } from '../user/user.dto';
 import { User } from '../user/user.schema';
 import { AuthenticationService } from './authentication.service';
 import ErrorHandler from '../utils/ErrorHandler';
@@ -133,6 +125,71 @@ export class AuthenticationController {
     } catch (error: any) {
       if (error instanceof ErrorHandler) {
         return response.status(HttpStatus.NOT_FOUND).json({
+          message: error.message,
+        });
+      } else {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  }
+
+  @Post('forgot-password')
+  @ApiOperation({ summary: 'Request password reset' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset request successful',
+  })
+  @ApiBadRequestResponse({
+    description: 'Password reset request failed due to bad request',
+  })
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDTO,
+    @Res() response,
+    @Next() next,
+  ) {
+    try {
+      await this.authService.requestPasswordReset(forgotPasswordDto.email);
+      return response.status(200).json({
+        success: true,
+        message: `Password reset instructions have been sent to your email.`,
+      });
+    } catch (error: any) {
+      if (error instanceof ErrorHandler) {
+        return response.status(HttpStatus.BAD_REQUEST).json({
+          message: error.message,
+        });
+      } else {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Reset password' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset successful',
+  })
+  @ApiBadRequestResponse({
+    description: 'Password reset failed due to bad request',
+  })
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDTO,
+    @Res() response,
+    @Next() next,
+  ) {
+    try {
+      await this.authService.resetPassword(
+        resetPasswordDto.resetToken,
+        resetPasswordDto.newPassword,
+      );
+      return response.status(200).json({
+        success: true,
+        message: `Password reset successfully!`,
+      });
+    } catch (error: any) {
+      if (error instanceof ErrorHandler) {
+        return response.status(HttpStatus.BAD_REQUEST).json({
           message: error.message,
         });
       } else {

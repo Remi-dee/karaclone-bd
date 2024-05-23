@@ -14,6 +14,8 @@ import configuration from './config/configuration';
 import { currencyPairModule } from './currencyPair/currency-pair.module';
 import { ConversionFeeModule } from './conversion-fee/conversion-fee.module';
 import { TransactionFeeModule } from './transaction-fee/transaction-fee.module';
+import { TradeModule } from './trade/trade.module';
+import { CurrencyConversionModule } from './currency-conversion/currency-conversion.module';
 import { KycModule } from './kyc/kyc.module';
 
 
@@ -31,6 +33,8 @@ import { KycModule } from './kyc/kyc.module';
     currencyPairModule,
     TransactionFeeModule,
     ConversionFeeModule,
+    TradeModule,
+    CurrencyConversionModule,
     KycModule,
   ],
   controllers: [AppController],

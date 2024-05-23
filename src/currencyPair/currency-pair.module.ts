@@ -17,5 +17,6 @@ import { User, UserSchema } from 'src/user/user.schema';
   ],
   controllers: [CurrencyPairController],
   providers: [CurrencyPairService, UserService],
+  exports: [CurrencyPairService],
 })
 export class currencyPairModule {}

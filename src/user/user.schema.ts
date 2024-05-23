@@ -90,6 +90,11 @@ export class User extends BaseSchema {
   @Prop({ type: [{ type: ObjectId, ref: 'Wallet' }] })
   wallets: Wallet[];
 
+  @Prop({ required: false })
+  resetPasswordToken: string;
+
+  @Prop({ required: false })
+  resetPasswordExpires: Date;
   @Prop({ type: ObjectId, ref: 'KYC' })
   kyc: string;
 }

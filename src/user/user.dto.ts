@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsEmail, Matches } from 'class-validator';
+import { IsNotEmpty, IsEmail, Matches, IsString } from 'class-validator';
 import { E_USER_ROLE, E_USER_TYPE } from './user.enum';
 import { REGEX, MESSAGES } from '../app.util';
 import { User } from './user.schema';
@@ -81,4 +81,23 @@ export class CreateUserDTO {
   @ApiProperty({ description: 'ID Document' })
   @IsNotEmpty({ message: 'ID Document is required' })
   user_id_card: string;
+}
+
+// user.dto.ts
+export class ForgotPasswordDTO {
+  @ApiProperty({ description: 'Email of user' })
+  @IsNotEmpty({ message: 'Email is required' })
+  @IsEmail()
+  email: string;
+}
+
+export class ResetPasswordDTO {
+  @ApiProperty({ description: 'Token sent to user' })
+  @IsNotEmpty({ message: 'Email is required' })
+  @IsString()
+  resetToken: string;
+
+  @ApiProperty({ description: 'New password of user' })
+  @IsNotEmpty({ message: 'Password is required' })
+  newPassword: string;
 }
