@@ -122,15 +122,15 @@ export class CurrencyPairController {
     @Query() { skip, limit }: PaginationParams,
   ): Promise<CurrencyPairListResponse> {
     try {
-      const id = req.user.id;
+      // const id = req.user.id;
 
-      const user = await this.userService.findOneById(id);
+      // const user = await this.userService.findOneById(id);
 
-      if (user.role !== 'superadmin') {
-        return res
-          .status(404)
-          .json({ message: 'You are not authorized to perform this action!' });
-      }
+      // if (user.role !== 'superadmin') {
+      //   return res
+      //     .status(404)
+      //     .json({ message: 'You are not authorized to perform this action!' });
+      // }
       const results = await this.currencyPairService.getAllCurrencyPairService(
         skip,
         limit,

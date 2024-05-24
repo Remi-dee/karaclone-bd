@@ -17,4 +17,16 @@ export class CurrencyConversionService {
     const convertedAmount = amount * exchangeRate;
     return convertedAmount;
   }
+
+  // get exchange rate
+  async getExchangeRate(
+    baseCurrency: string,
+    quoteCurrency: string,
+  ): Promise<number> {
+    const exchangeRate = await this.currencyPairService.getExchangeRate(
+      baseCurrency,
+      quoteCurrency,
+    );
+    return exchangeRate;
+  }
 }
