@@ -1,10 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CurrencyConversionDTO {
   @ApiProperty({ description: 'Amount to be converted' })
   @IsNotEmpty({ message: 'Amount is required' })
-  @IsNumber({}, { message: 'Amount must be a number' })
   readonly amount: number;
 
   @ApiProperty({ description: 'Source currency' })
@@ -16,4 +15,16 @@ export class CurrencyConversionDTO {
   @IsNotEmpty({ message: 'Target currency is required' })
   @IsString({ message: 'Target currency must be a string' })
   readonly targetCurrency: string;
+}
+
+export class ExchangeRateDTO {
+  @ApiProperty({ description: 'Base currency' })
+  @IsNotEmpty({ message: 'Base currency is required' })
+  @IsString({ message: 'Base currency must be a string' })
+  baseCurrency: string;
+
+  @ApiProperty({ description: 'Quote currency' })
+  @IsNotEmpty({ message: 'Quote currency is required' })
+  @IsString({ message: 'Quote currency must be a string' })
+  quoteCurrency: string;
 }
