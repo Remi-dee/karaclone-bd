@@ -17,7 +17,7 @@ import { TransactionFeeModule } from './transaction-fee/transaction-fee.module';
 import { TradeModule } from './trade/trade.module';
 import { CurrencyConversionModule } from './currency-conversion/currency-conversion.module';
 import { KycModule } from './kyc/kyc.module';
-
+import { MonoModule } from './mono/mono.module';
 
 @Module({
   imports: [
@@ -36,6 +36,7 @@ import { KycModule } from './kyc/kyc.module';
     TradeModule,
     CurrencyConversionModule,
     KycModule,
+    MonoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
