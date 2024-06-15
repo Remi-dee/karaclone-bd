@@ -8,6 +8,7 @@ import axios from 'axios';
 import { MonoUser } from './mono-user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { CreateMonoUserDTO, UpdateMonoUserDTO } from './mono.dto';
 
 @Injectable()
 export class MonoService {
@@ -15,21 +16,12 @@ export class MonoService {
   constructor(
     @InjectModel(MonoUser.name) private readonly monoUserModel: Model<MonoUser>,
   ) {}
-  async initiateAccountAuth(
-    customer: any,
-    meta: any,
-    scope: string,
-    redirectUrl: string,
-  ): Promise<any> {
+
+  async initiateAccountAuth(data: object): Promise<any> {
     try {
       const response = await axios.post(
         `${this.BASE_URL}/accounts/initiate`,
-        {
-          customer,
-          meta,
-          scope,
-          redirect_url: redirectUrl,
-        },
+        data,
         {
           headers: {
             accept: 'application/json',
@@ -46,20 +38,33 @@ export class MonoService {
     }
   }
 
-  async completeAccountAuth(code: string): Promise<any> {
+  async completeAccountAuth(code: string, userId: string): Promise<any> {
+    const url = `${this.BASE_URL}/v2/accounts/auth`;
     try {
       const response = await axios.post(
-        `${this.BASE_URL}/accounts/auth`,
-        {
-          code,
-        },
+        url,
+        { code },
         {
           headers: {
             accept: 'application/json',
             'content-type': 'application/json',
+            'mono-sec-key': process.env['MONO_SECRET_KEY'],
           },
         },
       );
+
+      const { id: monoId } = response.data;
+
+      const createMonoUserDTO: CreateMonoUserDTO = {
+        userId,
+        monoId,
+        monoCode: code,
+        monoStatus: false,
+      };
+
+      const monoUser = new this.monoUserModel(createMonoUserDTO);
+      await monoUser.save();
+
       return response.data;
     } catch (error) {
       throw new HttpException(
@@ -78,6 +83,7 @@ export class MonoService {
           headers: {
             accept: 'application/json',
             'content-type': 'application/json',
+            'mono-sec-key': process.env['MONO_SECRET_KEY'],
           },
         },
       );
@@ -90,11 +96,17 @@ export class MonoService {
     }
   }
 
-
   // Mono User Management
-  async createMonoUser(userId: string, monoDetails: any): Promise<MonoUser> {
-    const newMonoUser = new this.monoUserModel({ userId, ...monoDetails });
-    return newMonoUser.save();
+  async createMonoUser(
+    userId: string,
+    createMonoUserDto: CreateMonoUserDTO,
+  ): Promise<MonoUser> {
+    const existingUser = await this.monoUserModel.findOne({ userId });
+    if (existingUser) {
+      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    }
+    const newUser = new this.monoUserModel({ userId, ...createMonoUserDto });
+    return newUser.save();
   }
 
   async findMonoUserByUserId(userId: string): Promise<MonoUser> {
@@ -105,9 +117,18 @@ export class MonoService {
     return monoUser;
   }
 
-  async updateMonoUser(userId: string, monoDetails: any): Promise<MonoUser> {
-    const monoUser = await this.findMonoUserByUserId(userId);
-    Object.assign(monoUser, monoDetails);
-    return monoUser.save();
+  async updateMonoUser(
+    userId: string,
+    updateMonoUserDto: UpdateMonoUserDTO,
+  ): Promise<MonoUser> {
+    const user = await this.monoUserModel.findOneAndUpdate(
+      { userId },
+      updateMonoUserDto,
+      { new: true },
+    );
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
 }
