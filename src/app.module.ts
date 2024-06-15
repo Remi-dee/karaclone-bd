@@ -37,6 +37,7 @@ import { MonoModule } from './mono/mono.module';
     CurrencyConversionModule,
     KycModule,
     MonoModule,
+    TrueLayerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
