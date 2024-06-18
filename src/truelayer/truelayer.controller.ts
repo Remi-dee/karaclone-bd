@@ -11,10 +11,16 @@ import {
   ApiResponse,
   ApiBadRequestResponse,
   ApiBody,
+  ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { TrueLayerService } from './truelayer.service';
-import { PaymentRequestDTO } from './truelayer.dto';
+import { GenerateHeadersDTO, PaymentRequestDTO } from './truelayer.dto';
 
+@ApiTags('Truelayer')
+@ApiUnauthorizedResponse({
+  description: 'UnauthorisedException: Unauthorised to access resource',
+})
 @Controller('truelayer')
 export class TrueLayerController {
   constructor(private readonly trueLayerService: TrueLayerService) {}
@@ -41,9 +47,33 @@ export class TrueLayerController {
         data: result,
       });
     } catch (error) {
+      console.log('this is controller', error);
+
       throw new HttpException(
         error.response?.data || 'An error occurred',
         HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @ApiOperation({ summary: 'Generate headers for TrueLayer API' })
+  @ApiResponse({ status: 200, description: 'Headers generated successfully.' })
+  @ApiResponse({ status: 500, description: 'Internal server error.' })
+  @Post('generate-headers')
+  async generateHeaders(
+    @Body() generateHeadersDto: GenerateHeadersDTO,
+  ): Promise<Record<string, string>> {
+    try {
+      const headers = await this.trueLayerService.generateHeaders(
+        generateHeadersDto.path,
+        generateHeadersDto.method,
+        JSON.parse(generateHeadersDto.body),
+      );
+      return headers;
+    } catch (error) {
+      throw new HttpException(
+        error.response?.data || 'Failed to generate headers',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

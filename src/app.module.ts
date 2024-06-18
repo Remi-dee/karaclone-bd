@@ -18,6 +18,7 @@ import { TradeModule } from './trade/trade.module';
 import { CurrencyConversionModule } from './currency-conversion/currency-conversion.module';
 import { KycModule } from './kyc/kyc.module';
 import { MonoModule } from './mono/mono.module';
+import { TrueLayerModule } from './truelayer/truelayer.module';
 
 @Module({
   imports: [
