@@ -22,20 +22,41 @@ export class Trade extends BaseSchema {
   @Prop({ required: true })
   minimumBid: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
+  account_name: string;
+
+  @Prop({ required: false })
   bank_name: string;
 
   @Prop({ required: true })
+  payment_method: string;
+
+  @Prop({ required: true })
+  transaction_fee: string;
+
+  @Prop({ required: true })
+  vat_fee: string;
+
+  @Prop({ required: false })
   account_number: string;
 
-  @Prop({ required: true })
-  beneficiary_name: string;
-
-  @Prop({ required: true })
-  beneficiary_account: string;
+  @Prop({ required: false })
+  additional_information?: string;
 
   @Prop({ required: true, unique: true })
   tradeId: string;
+
+  @Prop({ required: true, unique: true })
+  readonly beneficiary_name: string;
+
+  @Prop({ required: true, unique: true })
+  readonly beneficiary_account: string;
+
+  @Prop({ required: true, unique: true })
+  readonly beneficiary_bank: string;
+
+  @Prop({ default: 0 })
+  sold: number;
 
   @Prop({ type: ObjectId, ref: 'User Id' })
   userId: ObjectId;
