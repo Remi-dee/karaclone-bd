@@ -5,11 +5,15 @@ import { Model, ObjectId } from 'mongoose';
 
 import { Trade } from './trade.schema';
 import { CreateTradeDTO } from './trade.dto';
+import { Beneficiary } from './beneficiary.schema';
+import { CreateBeneficiaryDTO } from './beneficiary.dto';
 
 @Injectable()
 export class TradeService {
   constructor(
     @InjectModel('Trade') private readonly tradeModel: Model<Trade>,
+    @InjectModel(Beneficiary.name)
+    private readonly beneficiaryModel: Model<Beneficiary>,
   ) {}
 
   async createTrade(userId: string, tradeData: CreateTradeDTO): Promise<Trade> {
@@ -40,6 +44,28 @@ export class TradeService {
       throw new NotFoundException(`Trade with Trade ID ${tradeId} not found`);
     }
     return trade;
+  }
+  async createBeneficiary(
+    userId: string,
+    beneficiaryData: CreateBeneficiaryDTO,
+  ): Promise<Beneficiary> {
+    const beneficiary = new this.beneficiaryModel({
+      ...beneficiaryData,
+      userId,
+    });
+    return await beneficiary.save();
+  }
+
+  async getUserBeneficiaries(userId: string): Promise<Beneficiary[]> {
+    return await this.beneficiaryModel.find({ userId }).exec();
+  }
+
+  async findBeneficiaryById(beneficiaryId: string): Promise<Beneficiary> {
+    const beneficiary = await this.beneficiaryModel.findById(beneficiaryId).exec();
+    if (!beneficiary) {
+      throw new NotFoundException(`Beneficiary with ID ${beneficiaryId} not found`);
+    }
+    return beneficiary;
   }
 
   private generateTradeId(): string {

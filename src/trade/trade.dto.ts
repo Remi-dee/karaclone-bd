@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateTradeDTO {
   @ApiProperty({ description: 'Trade Currency' })
@@ -23,12 +23,33 @@ export class CreateTradeDTO {
   readonly minimumBid: string;
 
   @ApiProperty({ description: 'Bank Name' })
-  @IsNotEmpty({ message: 'Bank name is required' })
+  @IsOptional()
   readonly bank_name: string;
 
+  @ApiProperty({ description: 'Payment Method' })
+  @IsNotEmpty({ message: 'Payment Method is required' })
+  payment_method: string;
+
+  @ApiProperty({ description: 'Transaction Fee' })
+  @IsNotEmpty({ message: 'Transaction Fee is required' })
+  transaction_fee: string;
+
+  @ApiProperty({ description: 'Vat Fee' })
+  @IsNotEmpty({ message: 'Vat Fee is required' })
+  vat_fee: string;
+
   @ApiProperty({ description: 'Account Number' })
-  @IsNotEmpty({ message: 'Account number is required' })
+  @IsOptional()
   readonly account_number: string;
+
+  @ApiProperty({ description: 'Account Name' })
+  @IsOptional()
+  readonly account_name: string;
+
+  @ApiProperty({ description: 'Additional Information', required: false })
+  @IsOptional()
+  @IsString()
+  readonly additional_information?: string;
 
   @ApiProperty({ description: 'Beneficiary Name' })
   @IsNotEmpty({ message: 'Beneficiary name is required' })
@@ -38,7 +59,12 @@ export class CreateTradeDTO {
   @IsNotEmpty({ message: 'Beneficiary account is required' })
   readonly beneficiary_account: string;
 
-  
+  @ApiProperty({ description: 'Sold Amount', default: 0 })
+  readonly sold: number = 0;
+
+  @ApiProperty({ description: 'Beneficiary Account' })
+  @IsNotEmpty({ message: 'Beneficiary account is required' })
+  readonly beneficiary_bank: string;
 }
 
 export class UpdateTradeDTO {
@@ -62,10 +88,4 @@ export class UpdateTradeDTO {
 
   @ApiProperty({ description: 'Account Number', required: false })
   readonly account_number: string;
-
-  @ApiProperty({ description: 'Beneficiary Name', required: false })
-  readonly beneficiary_name: string;
-
-  @ApiProperty({ description: 'Beneficiary Account', required: false })
-  readonly beneficiary_account: string;
 }

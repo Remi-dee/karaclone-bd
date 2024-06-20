@@ -27,6 +27,7 @@ import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
 import { TradeService } from './trade.service';
 import { CreateTradeDTO } from './trade.dto';
 import { ObjectId } from 'mongoose';
+import { CreateBeneficiaryDTO } from './beneficiary.dto';
 
 @Controller('Trade')
 @ApiBearerAuth('Authorization')
@@ -126,4 +127,46 @@ export class TradeController {
       throw new NotFoundException(`Trade with Trade ID ${tradeId} not found`);
     }
   }
+
+  @Post('create-beneficiary')
+  @ApiOperation({ summary: 'Create a new beneficiary' })
+  @ApiCreatedResponse({ description: 'Beneficiary created successfully' })
+  @ApiBadRequestResponse({ description: 'Failed to create beneficiary' })
+  async createBeneficiary(
+    @Res() res,
+    @Req() req,
+    @Body() beneficiaryBody: CreateBeneficiaryDTO,
+  ) {
+    try {
+      const userId = req.user.id;
+      const beneficiary = await this.tradeService.createBeneficiary(
+        userId,
+        beneficiaryBody,
+      );
+      return res.status(HttpStatus.CREATED).json({
+        message: 'Beneficiary created successfully',
+        beneficiary,
+      });
+    } catch (error) {
+      Logger.error(error);
+      throw new HttpException(
+        'Failed to create beneficiary',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('get-user-beneficiaries')
+  @ApiOperation({ summary: 'Get all beneficiaries of the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of user beneficiaries',
+  })
+  @ApiBadRequestResponse({ description: 'Failed to get beneficiaries' })
+  async getUserBeneficiaries(@Req() req) {
+    const userId = req.user.id;
+    return await this.tradeService.getUserBeneficiaries(userId);
+  }
+
+  
 }
