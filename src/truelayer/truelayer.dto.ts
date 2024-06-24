@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -48,6 +49,7 @@ class Beneficiary {
     example: 'fedeTest 123 1',
   })
   @IsString()
+  @IsOptional()
   reference: string;
 }
 
@@ -88,7 +90,6 @@ class Address {
     example: '40 Finsbury Square',
   })
   @IsString()
-  @IsNotEmpty()
   address_line1: string;
 
   @ApiProperty({
@@ -96,7 +97,6 @@ class Address {
     example: 'London',
   })
   @IsString()
-  @IsNotEmpty()
   city: string;
 
   @ApiProperty({
@@ -111,7 +111,6 @@ class Address {
     example: 'EC2A 1PX',
   })
   @IsString()
-  @IsNotEmpty()
   zip: string;
 
   @ApiProperty({
@@ -119,7 +118,6 @@ class Address {
     example: 'GB',
   })
   @IsString()
-  @IsNotEmpty()
   country_code: string;
 }
 
