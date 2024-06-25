@@ -71,6 +71,11 @@ export class AuthenticationService {
       business_email,
       business_line,
       business_name,
+      date_of_birth,
+      city,
+      state,
+      zip,
+      country_code,
     } = regBody;
 
     if (!this.isValidEmail(email)) {
@@ -94,6 +99,11 @@ export class AuthenticationService {
       business_email,
       business_line,
       business_name,
+      date_of_birth,
+      city,
+      state,
+      zip,
+      country_code,
     };
 
     const activationToken = this.createActivationToken(user);
@@ -203,7 +213,7 @@ export class AuthenticationService {
     user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour from now
     await user.save();
 
-    const resetUrl = `${process.env.FRONTEND_URL}/new-password?token=${resetToken}`
+    const resetUrl = `${process.env.FRONTEND_URL}/new-password?token=${resetToken}`;
     // const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}&email=${email}`;
     console.log('this is', resetToken);
     const data = { user: { name: user.name }, resetUrl };
