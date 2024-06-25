@@ -97,6 +97,21 @@ export class User extends BaseSchema {
   resetPasswordExpires: Date;
   @Prop({ type: ObjectId, ref: 'KYC' })
   kyc: string;
+
+  @Prop({ required: false })
+  date_of_birth: string;
+
+  @Prop({ required: false })
+  city: string;
+
+  @Prop({ required: false })
+  state: string;
+
+  @Prop({ required: false })
+  zip: string;
+
+  @Prop({ required: false })
+  country_code: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

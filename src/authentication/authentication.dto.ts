@@ -45,17 +45,32 @@ export class RegisterUserDTO {
   @IsNotEmpty({ message: 'Phone number is required' })
   readonly phone: string;
 
-  @ApiProperty({ description: 'Business number of user' })
+  @ApiProperty({ description: 'Business name of user' })
   readonly business_name: string;
 
-  @ApiProperty({ description: 'Phone number of user' })
+  @ApiProperty({ description: 'Business address of user' })
   readonly business_address: string;
 
-  @ApiProperty({ description: 'Phone number of user' })
+  @ApiProperty({ description: 'Business email of user' })
   readonly business_email: string;
 
-  @ApiProperty({ description: 'Phone number of user' })
+  @ApiProperty({ description: 'Business line of user' })
   readonly business_line: string;
+
+  @ApiProperty({ description: 'Date of Birth' })
+  readonly date_of_birth: string;
+
+  @ApiProperty({ description: 'City of user' })
+  readonly city: string;
+
+  @ApiProperty({ description: 'state of user' })
+  readonly state: string;
+
+  @ApiProperty({ description: 'Zip of user' })
+  readonly zip: string;
+
+  @ApiProperty({ description: 'City of user' })
+  readonly country_code: string;
 
   @ApiProperty({ description: 'User Password' })
   @IsNotEmpty({ message: 'Password is required' })

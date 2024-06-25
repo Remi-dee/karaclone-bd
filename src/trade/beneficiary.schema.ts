@@ -22,12 +22,12 @@ export class Beneficiary extends Document {
   swift_code: string;
 
   @Prop({ required: false })
-  ACH_Routing: string;
+  ach_routing: string;
 
   @Prop({ required: false })
-  Account_Type: string;
+  account_type: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   bank_address: string;
 }
 

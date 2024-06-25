@@ -21,10 +21,10 @@ export class CreateBeneficiaryDTO {
   readonly swift_code: string;
 
   @ApiProperty({ description: 'ACH Routing' })
-  ACH_Routing: string;
+  readonly ach_routing: string;
 
   @ApiProperty({ description: 'Account Type' })
-  Account_Type: string;
+  readonly account_type: string;
 
   @ApiProperty({ description: 'Bank Address' })
   bank_address: string;
