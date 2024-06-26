@@ -3,6 +3,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -22,6 +23,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
 import { TradeService } from './trade.service';
@@ -168,5 +170,55 @@ export class TradeController {
     return await this.tradeService.getUserBeneficiaries(userId);
   }
 
-  
+  @Delete('delete-beneficiary/:id')
+  @ApiOperation({ summary: 'Delete a beneficiary by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Beneficiary deleted successfully',
+  })
+  @ApiNotFoundResponse({ description: 'Beneficiary not found' })
+  @ApiBadRequestResponse({ description: 'Failed to delete beneficiary' })
+  async deleteBeneficiary(@Param('id') id: string, @Req() req, @Res() res) {
+    try {
+      const userId = req.user.id;
+      const beneficiary = await this.tradeService.deleteBeneficiaryById(
+        id,
+        userId,
+      );
+      return res.status(HttpStatus.OK).json({
+        message: 'Beneficiary deleted successfully',
+        beneficiary,
+      });
+    } catch (error) {
+      Logger.error(error);
+      throw new HttpException(
+        'Failed to delete beneficiary',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Delete('delete-all-beneficiaries')
+  @ApiOperation({ summary: 'Delete all beneficiaries of the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'All beneficiaries deleted successfully',
+  })
+  @ApiBadRequestResponse({ description: 'Failed to delete beneficiaries' })
+  async deleteAllBeneficiaries(@Req() req, @Res() res) {
+    try {
+      const userId = req.user.id;
+      const result = await this.tradeService.deleteAllBeneficiaries(userId);
+      return res.status(HttpStatus.OK).json({
+        message: 'All beneficiaries deleted successfully',
+        deletedCount: result.deletedCount,
+      });
+    } catch (error) {
+      Logger.error(error);
+      throw new HttpException(
+        'Failed to delete beneficiaries',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
