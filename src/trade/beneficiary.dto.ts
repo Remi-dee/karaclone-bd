@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBeneficiaryDTO {
@@ -15,17 +15,22 @@ export class CreateBeneficiaryDTO {
   readonly bank_name: string;
 
   @ApiProperty({ description: 'Bank Currency' })
+  @IsNotEmpty({ message: 'Currency is required' })
   readonly currency: string;
 
   @ApiProperty({ description: 'Swift Code' })
+  @IsOptional()
   readonly swift_code: string;
 
   @ApiProperty({ description: 'ACH Routing' })
+  @IsOptional()
   readonly ach_routing: string;
 
   @ApiProperty({ description: 'Account Type' })
+  @IsOptional()
   readonly account_type: string;
 
   @ApiProperty({ description: 'Bank Address' })
+  @IsOptional()
   bank_address: string;
 }

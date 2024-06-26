@@ -49,6 +49,7 @@ export class TradeService {
     userId: string,
     beneficiaryData: CreateBeneficiaryDTO,
   ): Promise<Beneficiary> {
+    console.log('Beneficiary Data:', beneficiaryData);
     const beneficiary = new this.beneficiaryModel({
       ...beneficiaryData,
       userId,
@@ -61,11 +62,37 @@ export class TradeService {
   }
 
   async findBeneficiaryById(beneficiaryId: string): Promise<Beneficiary> {
-    const beneficiary = await this.beneficiaryModel.findById(beneficiaryId).exec();
+    const beneficiary = await this.beneficiaryModel
+      .findById(beneficiaryId)
+      .exec();
     if (!beneficiary) {
-      throw new NotFoundException(`Beneficiary with ID ${beneficiaryId} not found`);
+      throw new NotFoundException(
+        `Beneficiary with ID ${beneficiaryId} not found`,
+      );
     }
     return beneficiary;
+  }
+
+  async deleteBeneficiaryById(
+    beneficiaryId: string,
+    userId: string,
+  ): Promise<Beneficiary> {
+    const beneficiary = await this.beneficiaryModel
+      .findOneAndDelete({ _id: beneficiaryId, userId })
+      .exec();
+    if (!beneficiary) {
+      throw new NotFoundException(
+        `Beneficiary with ID ${beneficiaryId} not found`,
+      );
+    }
+    return beneficiary;
+  }
+
+  async deleteAllBeneficiaries(
+    userId: string,
+  ): Promise<{ deletedCount: number }> {
+    const result = await this.beneficiaryModel.deleteMany({ userId }).exec();
+    return { deletedCount: result.deletedCount };
   }
 
   private generateTradeId(): string {

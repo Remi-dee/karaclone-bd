@@ -15,7 +15,7 @@ export class Beneficiary extends Document {
   @Prop({ required: true })
   bank_name: string;
 
-  @Prop({ required: false })
+  @Prop({ required: true })
   currency: string;
 
   @Prop({ required: false })
