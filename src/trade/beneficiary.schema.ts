@@ -29,6 +29,8 @@ export class Beneficiary extends Document {
 
   @Prop({ required: false })
   bank_address: string;
+
+  
 }
 
 export const BeneficiarySchema = SchemaFactory.createForClass(Beneficiary);
