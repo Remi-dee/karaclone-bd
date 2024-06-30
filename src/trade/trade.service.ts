@@ -1,10 +1,14 @@
 import * as crypto from 'crypto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 
-import { Trade } from './trade.schema';
-import { CreateTradeDTO } from './trade.dto';
+import { BuyTrade, Trade } from './trade.schema';
+import { BuyTradeDTO, CreateTradeDTO } from './trade.dto';
 import { Beneficiary } from './beneficiary.schema';
 import { CreateBeneficiaryDTO } from './beneficiary.dto';
 
@@ -12,18 +16,102 @@ import { CreateBeneficiaryDTO } from './beneficiary.dto';
 export class TradeService {
   constructor(
     @InjectModel('Trade') private readonly tradeModel: Model<Trade>,
+
     @InjectModel(Beneficiary.name)
     private readonly beneficiaryModel: Model<Beneficiary>,
+    @InjectModel('BuyTrade') private readonly buyTradeModel: Model<BuyTrade>,
   ) {}
 
   async createTrade(userId: string, tradeData: CreateTradeDTO): Promise<Trade> {
     const tradeId = this.generateTradeId();
+    const amount = Number(tradeData.amount);
+    const sold = 0; // Initialize sold to 0
+    const available_amount = amount - sold;
+    const price = tradeData.amount * tradeData.rate;
     const trade = new this.tradeModel({
       ...tradeData,
       tradeId,
       userId,
+      sold,
+      available_amount,
+      price,
     });
     return await trade.save();
+  }
+
+  async deleteAllTrades(): Promise<{ deletedCount: number }> {
+    const result = await this.tradeModel.deleteMany({}).exec();
+    return { deletedCount: result.deletedCount };
+  }
+
+  async deleteTradeById(tradeId: string): Promise<Trade> {
+    const trade = await this.tradeModel.findOneAndDelete({ tradeId }).exec();
+    if (!trade) {
+      throw new NotFoundException(`Trade with Trade ID ${tradeId} not found`);
+    }
+    return trade;
+  }
+
+  async deleteTradesByUserId(
+    userId: string,
+  ): Promise<{ deletedCount: number }> {
+    const result = await this.tradeModel.deleteMany({ userId }).exec();
+    return { deletedCount: result.deletedCount };
+  }
+
+  async buyTrade(userId: string, buyTradeData: BuyTradeDTO): Promise<Trade> {
+    const trade = await this.findTradeByTradeId(buyTradeData.tradeId);
+    const amountToBuy = Number(buyTradeData.purchase);
+    const price = amountToBuy * trade.rate;
+    if (isNaN(amountToBuy) || amountToBuy <= 0) {
+      throw new BadRequestException('Invalid amount to buy');
+    }
+
+    if (amountToBuy > trade.available_amount) {
+      throw new BadRequestException('Amount exceeds available trade amount');
+    }
+
+    const updatedTrade = await this.tradeModel.findOneAndUpdate(
+      { tradeId: buyTradeData.tradeId },
+      { $inc: { sold: amountToBuy, available_amount: -amountToBuy } },
+      { new: true }, // Return the updated document
+    );
+
+    if (!updatedTrade) {
+      throw new NotFoundException('Trade not found or update failed');
+    }
+
+    const buyTrade = new this.buyTradeModel({
+      transaction_id: trade.tradeId,
+      userId,
+      purchase: amountToBuy,
+      beneficiary_name: buyTradeData.beneficiary_name,
+      beneficiary_account: buyTradeData.beneficiary_account,
+      beneficiary_bank: buyTradeData.beneficiary_bank,
+      payment_method: buyTradeData.payment_method,
+      status: 'completed', // Set the initial status
+      price,
+    });
+
+    await buyTrade.save();
+
+    return updatedTrade;
+  }
+
+  async getAllBoughtTrades(): Promise<BuyTrade[]> {
+    return this.buyTradeModel.find().exec();
+  }
+
+  async getBoughtTrade(id: string): Promise<BuyTrade> {
+    const trade = await this.buyTradeModel.findById(id).exec();
+    if (!trade) {
+      throw new NotFoundException('Trade not found');
+    }
+    return trade;
+  }
+
+  async getUserBoughtTrades(userId: string): Promise<BuyTrade[]> {
+    return this.buyTradeModel.find({ userId }).exec();
   }
 
   async findAll(): Promise<Trade[]> {
@@ -97,6 +185,16 @@ export class TradeService {
 
   private generateTradeId(): string {
     const prefix = 'FXK-';
+    const suffix = crypto
+      .randomBytes(3)
+      .toString('hex')
+      .toUpperCase()
+      .slice(0, 6);
+    return `${prefix}${suffix}`;
+  }
+
+  private generateTransactionId(): string {
+    const prefix = 'TX-';
     const suffix = crypto
       .randomBytes(3)
       .toString('hex')

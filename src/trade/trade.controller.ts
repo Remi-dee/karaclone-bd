@@ -24,12 +24,14 @@ import {
   ApiUnauthorizedResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
+  ApiParam,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
 import { TradeService } from './trade.service';
-import { CreateTradeDTO } from './trade.dto';
+import { BuyTradeDTO, CreateTradeDTO } from './trade.dto';
 import { ObjectId } from 'mongoose';
 import { CreateBeneficiaryDTO } from './beneficiary.dto';
+import { BuyTrade } from './trade.schema';
 
 @Controller('Trade')
 @ApiBearerAuth('Authorization')
@@ -67,6 +69,118 @@ export class TradeController {
     }
   }
 
+  @Delete('delete-all-trades')
+  @ApiOperation({ summary: 'Delete all trades' })
+  @ApiCreatedResponse({ description: 'Trades deleted successfully' })
+  @ApiBadRequestResponse({ description: 'Failed to delete trades' })
+  @ApiResponse({
+    status: 200,
+    description: 'Delete all trades',
+  })
+  async deleteAllTrades() {
+    return await this.tradeService.deleteAllTrades();
+  }
+
+  @Delete('delete-a-trade/:tradeId')
+  @ApiOperation({ summary: 'Delete a trade' })
+  @ApiCreatedResponse({ description: 'Trade deleted successfully' })
+  @ApiBadRequestResponse({ description: 'Failed to delete a trade' })
+  @ApiResponse({
+    status: 200,
+    description: 'Delete a trade',
+  })
+  async deleteTradeById(@Param('tradeId') tradeId: string) {
+    return await this.tradeService.deleteTradeById(tradeId);
+  }
+
+  @ApiOperation({ summary: 'Delete trades by user ID' })
+  @ApiParam({
+    name: 'userId',
+    required: true,
+    description: 'The ID of the user whose trades to delete',
+  })
+  @ApiResponse({ status: 200, description: 'Trades deleted successfully.' })
+  @Delete('delete-my-trades/user/:userId')
+  async deleteTradesByUserId(@Param('userId') userId: string, @Res() res) {
+    const result = await this.tradeService.deleteTradesByUserId(userId);
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @ApiOperation({ summary: 'Delete trades for the authenticated user' })
+  @ApiResponse({ status: 200, description: 'Trades deleted successfully.' })
+  @Delete('delete-my-trades/user/')
+  async deleteMyTrades(@Req() req, @Res() res) {
+    const userId = req.user.id;
+    const result = await this.tradeService.deleteTradesByUserId(userId);
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @Post('buy-trade')
+  @ApiOperation({ summary: 'Buy a trade' })
+  @ApiCreatedResponse({ description: 'Trade bought successfully' })
+  @ApiBadRequestResponse({ description: 'Failed to buy a trade' })
+  async buyTrade(@Res() res, @Req() req, @Body() buyTradeBody: BuyTradeDTO) {
+    try {
+      const userId = req.user.id;
+      const trade = await this.tradeService.buyTrade(userId, buyTradeBody);
+      return res.status(HttpStatus.OK).json({
+        message: 'Trade bought successfully',
+        trade,
+      });
+    } catch (error) {
+      Logger.error(error);
+      throw new HttpException(
+        'Failed to buy trade',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('bought-trades')
+  @ApiOperation({ summary: 'Get all bought trades' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all bought trades',
+    type: [BuyTrade],
+  })
+  async getAllBoughtTrades() {
+    return await this.tradeService.getAllBoughtTrades();
+  }
+
+  @Get('bought-trade/:id')
+  @ApiOperation({ summary: 'Get a single bought trade by ID' })
+  @ApiParam({ name: 'id', description: 'ID of the bought trade' })
+  @ApiResponse({
+    status: 200,
+    description: 'Bought trade found',
+    type: BuyTrade,
+  })
+  @ApiResponse({ status: 404, description: 'Trade not found' })
+  async getBoughtTrade(@Param('id') id: string) {
+    return await this.tradeService.getBoughtTrade(id);
+  }
+
+  @Get('my-bought-trades')
+  @ApiOperation({ summary: 'Get all bought trades for the signed-in user' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all bought trades for the signed-in user',
+    type: [BuyTrade],
+  })
+  async getUserBoughtTrades(@Req() req, @Res() res) {
+    try {
+      const userId = req.user.id; // Retrieve user ID from request context
+      const userBoughtTrades =
+        await this.tradeService.getUserBoughtTrades(userId);
+      return res.status(HttpStatus.OK).json(userBoughtTrades);
+    } catch (error) {
+      Logger.error(error);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Failed to fetch user bought trades',
+        error: error.message,
+      });
+    }
+  }
   @Get('get-all-trades')
   @ApiOperation({
     summary: 'Get all trades',
