@@ -15,6 +15,9 @@ export class Trade extends BaseSchema {
   currency: string;
 
   @Prop({ required: true })
+  status: string;
+
+  @Prop({ required: true })
   exit_currency: string;
 
   @Prop({ required: true })
@@ -79,7 +82,6 @@ export class BuyTrade extends Document {
 
   @Prop({ required: true })
   userId: ObjectId;
-
 
   @Prop({ required: true })
   purchase: number;

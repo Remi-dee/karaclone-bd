@@ -27,7 +27,8 @@ export class TradeService {
     const amount = Number(tradeData.amount);
     const sold = 0; // Initialize sold to 0
     const available_amount = amount - sold;
-    const price = tradeData.amount * tradeData.rate;
+    const price = Math.round(tradeData.amount * tradeData.rate);
+
     const trade = new this.tradeModel({
       ...tradeData,
       tradeId,
@@ -62,7 +63,9 @@ export class TradeService {
   async buyTrade(userId: string, buyTradeData: BuyTradeDTO): Promise<Trade> {
     const trade = await this.findTradeByTradeId(buyTradeData.tradeId);
     const amountToBuy = Number(buyTradeData.purchase);
-    const price = amountToBuy * trade.rate;
+
+    const price = Math.round(amountToBuy * trade.rate);
+
     if (isNaN(amountToBuy) || amountToBuy <= 0) {
       throw new BadRequestException('Invalid amount to buy');
     }

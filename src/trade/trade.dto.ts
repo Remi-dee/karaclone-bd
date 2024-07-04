@@ -31,6 +31,10 @@ export class CreateTradeDTO {
   @IsNotEmpty({ message: 'Payment Method is required' })
   payment_method: string;
 
+  @ApiProperty({ description: 'Payment Status' })
+  @IsNotEmpty({ message: 'Payment Status is required' })
+  status: string;
+
   @ApiProperty({ description: 'Transaction Fee' })
   @IsNotEmpty({ message: 'Transaction Fee is required' })
   transaction_fee: string;
