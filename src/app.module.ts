@@ -19,6 +19,7 @@ import { CurrencyConversionModule } from './currency-conversion/currency-convers
 import { KycModule } from './kyc/kyc.module';
 import { MonoModule } from './mono/mono.module';
 import { TrueLayerModule } from './truelayer/truelayer.module';
+import { UserTransactionsModule } from './users-transactions/user-transactions.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { TrueLayerModule } from './truelayer/truelayer.module';
     KycModule,
     MonoModule,
     TrueLayerModule,
+    UserTransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
