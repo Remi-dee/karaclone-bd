@@ -11,6 +11,7 @@ import {
   Request,
   HttpStatus,
   Res,
+  Query,
 } from '@nestjs/common';
 
 import {
@@ -65,12 +66,17 @@ export class UserTransactionsController {
     status: 200,
     description: 'Successfully retrieved transactions.',
   })
-  async findAll(@Res() res: any): Promise<UserTransaction[]> {
-    const transactions = await this.userTransactionsService.findAll();
-
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Res() res: any,
+  ): Promise<any> {
+    const { transactions, totalItems } =
+      await this.userTransactionsService.findAll(Number(page), Number(limit));
     return res.status(HttpStatus.OK).json({
-      message: 'Transactions retreived successfully',
+      message: 'Transactions retrieved successfully',
       transactions,
+      totalItems,
     });
   }
 

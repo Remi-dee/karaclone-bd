@@ -13,7 +13,7 @@ export class TrueLayerService {
   private readonly CLIENT_SECRET: string;
   private readonly SCOPE: string;
   private readonly GRANT_TYPE: string;
-
+// NOT applicable
   private accessToken: string | null = null;
   private tokenExpiration: number | null = null;
 

@@ -28,9 +28,24 @@ export class UserTransactionsService {
     return createdUserTransactions.save();
   }
 
-  async findAll(): Promise<UserTransaction[]> {
-    const transactions = await this.userTransactionsModel.find().exec();
-    return transactions.map((transaction) => this.formatDate(transaction));
+  async findAll(
+    page: number,
+    limit: number,
+  ): Promise<{ transactions: UserTransaction[]; totalItems: number }> {
+    const skip = (page - 1) * limit;
+    const totalItems = await this.userTransactionsModel.countDocuments().exec();
+    const transactions = await this.userTransactionsModel
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    return {
+      transactions: transactions.map((transaction) =>
+        this.formatDate(transaction),
+      ),
+      totalItems,
+    };
   }
 
   async findOne(id: string): Promise<UserTransaction> {
@@ -73,6 +88,8 @@ export class UserTransactionsService {
   }
 
   async dropBeneficiaryAccountIndex(): Promise<void> {
-    await this.userTransactionsModel.collection.dropIndex('beneficiary_account_1');
+    await this.userTransactionsModel.collection.dropIndex(
+      'beneficiary_account_1',
+    );
   }
 }
