@@ -4,15 +4,12 @@ import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { CreateWalletDTO, UpdateWalletDTO } from './wallet.dto';
 import { Wallet, WalletDocument } from './wallet.schema';
-import { User, UserDocument } from '../user/user.schema';
-import ErrorHandler from '../utils/ErrorHandler';
 
 @Injectable()
 export class WalletService {
   constructor(
     @InjectModel(Wallet.name)
     private readonly _walletModel: Model<WalletDocument>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
   async findOneById(id: ObjectId): Promise<Wallet | null> {
@@ -20,32 +17,12 @@ export class WalletService {
   }
 
   async getAllWalletsByUser(userId: ObjectId): Promise<Wallet[]> {
-    const userWithWallets = await this.userModel
-      .findById(userId)
-      .populate('wallets')
-      .exec();
-
-    if (!userWithWallets) {
-      throw new ErrorHandler('unable to fetch user wallets', 400);
-    }
-    return userWithWallets.wallets;
+    return await this._walletModel.find({ user: userId }).exec();
   }
 
-  async createWallet(
-    userId: ObjectId,
-    walletData: CreateWalletDTO,
-  ): Promise<Wallet | any> {
+  async createWallet(walletData: CreateWalletDTO): Promise<Wallet | any> {
     const createdWallet = new this._walletModel(walletData);
-    const user = await this.userModel.findById(userId).exec();
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    user.wallets.push(createdWallet);
-    await user.save();
-
-    return createdWallet.save();
+    return await createdWallet.save();
   }
 
   async updateWallet(
@@ -54,10 +31,36 @@ export class WalletService {
   ): Promise<Wallet | undefined | any> {
     const updatedWallet = await this._walletModel
       .findByIdAndUpdate(id, updateWalletDTO, {
-        new: true,
+        new: true, // Return the updated document
       })
-      .populate('transactions')
       .exec();
     return updatedWallet;
+  }
+
+  async deleteAllWalletsByUser(userId: ObjectId): Promise<void> {
+    await this._walletModel.deleteMany({ user: userId }).exec();
+  }
+
+  async fundWallet(
+    userId: ObjectId,
+    fundWalletDTO: CreateWalletDTO,
+  ): Promise<Wallet> {
+    const { currency_code, escrow_balance } = fundWalletDTO;
+
+    const wallet = await this._walletModel
+      .findOne({ user: userId, currency_code })
+      .exec();
+
+    if (wallet) {
+      wallet.escrow_balance += escrow_balance;
+      return await wallet.save();
+    } else {
+      const newWallet = new this._walletModel({
+        user: userId,
+        currency_code,
+        escrow_balance,
+      });
+      return await newWallet.save();
+    }
   }
 }

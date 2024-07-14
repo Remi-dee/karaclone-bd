@@ -137,4 +137,12 @@ export class BuyTradeDTO {
   @ApiProperty({ description: 'Bank Name' })
   @IsOptional()
   readonly bank_name: string;
+
+  @ApiProperty({ description: 'Purchase Currency' })
+  @IsOptional()
+  readonly purchase_currency: string;
+
+  @ApiProperty({ description: 'Paid Currency' })
+  @IsOptional()
+  readonly paid_currency: string;
 }

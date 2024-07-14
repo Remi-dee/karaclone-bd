@@ -112,6 +112,12 @@ export class BuyTrade extends Document {
 
   @Prop({ required: false })
   account_number: string;
+
+  @Prop({ required: false })
+  purchase_currency: string;
+  
+  @Prop({ required: false })
+  paid_currency: string;
 }
 
 export const TradeSchema = SchemaFactory.createForClass(Trade);

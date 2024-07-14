@@ -3,22 +3,28 @@ import { ConfigService } from '@nestjs/config';
 import * as tlSigning from 'truelayer-signing';
 import { randomUUID } from 'crypto';
 import axios from 'axios';
-import { PaymentRequestDTO } from './truelayer.dto';
+import {
+  DirectDepositRequestDTO,
+  PaymentRequestDTO,
+  WithdrawalRequestDTO,
+} from './truelayer.dto';
 
 @Injectable()
 export class TrueLayerService {
   private readonly BASE_URL: string;
+  private readonly PAY_DIRECT_URL: string;
   private readonly AUTH_URL: string;
   private readonly CLIENT_ID: string;
   private readonly CLIENT_SECRET: string;
   private readonly SCOPE: string;
   private readonly GRANT_TYPE: string;
-// NOT applicable
+
   private accessToken: string | null = null;
   private tokenExpiration: number | null = null;
 
   constructor(private readonly configService: ConfigService) {
     this.BASE_URL = this.configService.get<string>('TRUELAYER_BASE_URL');
+    this.PAY_DIRECT_URL = this.configService.get<string>('PAY_DIRECT_URL');
     this.AUTH_URL = this.configService.get<string>('TRUELAYER_AUTH_URL');
     this.CLIENT_ID = this.configService.get<string>('TRUELAYER_CLIENT_ID');
     this.CLIENT_SECRET = this.configService.get<string>(
@@ -109,60 +115,7 @@ export class TrueLayerService {
     } catch (error) {
       console.log('unable to sign key:', error);
     }
-
-    // const request = {
-    //   method: 'POST',
-    //   url: 'https://api.truelayer-sandbox.com/test-signature',
-    //   // Request body & any signed headers *must* exactly match what was used to generate the signature.
-    //   data: body,
-    //   headers: {
-    //     Authorization: `Bearer ${accessToken}`,
-    //     'Idempotency-Key': idempotencyKey,
-    //     'X-Bar-Header': 'abcdefg',
-    //     'Tl-Signature': tlSignature,
-    //   },
-    // };
-    // console.log('Sending ' + JSON.stringify(request, null, 2) + '\n');
-
-    // axios(request)
-    //   // 204 means success
-    //   .then((response) => console.log(`${response.status} ✓`))
-    //   // 401 means either the access token is invalid, or the signature is invalid.
-    //   .catch((err) =>
-    //     console.warn(
-    //       `${err.response.status} ${JSON.stringify(err.response.data)}`,
-    //     ),
-    //   );
   }
-
-  // private async generateHeaders(
-  //   path: string,
-  //   method: any,
-  //   body: any,
-  // ): Promise<Record<string, string>> {
-  //   const accessToken = await this.getAccessToken();
-  //   console.log('this is token,', accessToken);
-  //   const idempotencyKey = randomUUID();
-  //   const tlSignature = tlSigning.sign({
-  //     kid: this.configService.get<string>('TRUELAYER_KID'),
-  //     privateKeyPem: this.configService.get<string>('TRUELAYER_PRIVATE_KEY'),
-  //     method,
-  //     path: '/v3/payments',
-  //     headers: {
-  //       'Idempotency-Key': idempotencyKey,
-  //       'X-Bar-Header': 'abcdefg',
-  //     },
-  //     body: JSON.stringify(body),
-  //   });
-  //   console.log('this is2', tlSignature);
-  //   return {
-  //     Authorization: `Bearer ${accessToken}`,
-  //     'Idempotency-Key': idempotencyKey,
-  //     'X-Bar-Header': 'abcdefg',
-  //     'Tl-Signature': tlSignature,
-  //     'Content-Type': 'application/json',
-  //   };
-  // }
 
   async initiatePayment(paymentRequest: PaymentRequestDTO): Promise<any> {
     const path = '/v3/payments';
@@ -202,6 +155,81 @@ export class TrueLayerService {
     }
   }
 
+  async initiateWithdrawal(
+    withdrawalRequest: WithdrawalRequestDTO,
+  ): Promise<any> {
+    const path = '/v1/withdrawals';
+    const method = 'POST';
+
+    // Ensure transaction_id is set
+    if (!withdrawalRequest.transaction_id) {
+      withdrawalRequest.transaction_id = randomUUID();
+    }
+
+    const headers = await this.generateHeaders(path, method, withdrawalRequest);
+
+    try {
+      const response = await axios.post(
+        `${this.PAY_DIRECT_URL}${path}`,
+        withdrawalRequest,
+        {
+          headers,
+          timeout: 30000,
+        },
+      );
+      return response.data;
+    } catch (error) {
+      console.error('this is service error', error);
+      if (error.response) {
+        throw new HttpException(
+          error.response.data ||
+            'An error occurred during withdrawal initiation',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else {
+        throw new HttpException(
+          'An error occurred during withdrawal initiation',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
+  }
+
+  async initiateDirectDeposit(
+    depositRequest: DirectDepositRequestDTO,
+  ): Promise<any> {
+    const path = '/v1/users/deposits';
+    const method = 'POST';
+    const headers = await this.generateHeaders(path, method, depositRequest);
+    console.log('hold on we got here, this is deposit controller');
+    console.log(`${this.PAY_DIRECT_URL}${path}`);
+    try {
+      const response = await axios.post(
+        `${this.PAY_DIRECT_URL}${path}`,
+        depositRequest,
+        {
+          headers,
+          timeout: 30000,
+        },
+      );
+
+      return response.data;
+    } catch (error) {
+      console.log('this is deposit service error', error);
+      if (error.response) {
+        console.log('this is deposit service error', error.response);
+        throw new HttpException(
+          error.response.data || 'An error occurred during deposit initiation',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else {
+        throw new HttpException(
+          'An error occurred during deposit initiation',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
+  }
   // Add other methods that use the generateHeaders method
   async someOtherEndpoint(someRequest: any): Promise<any> {
     const path = '/some/other/endpoint';

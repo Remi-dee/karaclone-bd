@@ -1,24 +1,29 @@
 import {
   Controller,
+  Post,
+  Put,
+  Delete,
   Get,
-  HttpException,
-  HttpStatus,
-  Logger,
-  Req,
-  Res,
+  Param,
+  Body,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
-  ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiParam,
+  ApiBody,
+  ApiBearerAuth,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
 import { WalletService } from './wallet.service';
-import ErrorHandler from '../utils/ErrorHandler';
+import { CreateWalletDTO, UpdateWalletDTO } from './wallet.dto';
+import { ObjectId } from 'mongodb';
+import { Wallet } from './wallet.schema';
+import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
+import { Types } from 'mongoose';
 
 @ApiBearerAuth('Authorization')
 @ApiTags('Wallet')
@@ -26,45 +31,103 @@ import ErrorHandler from '../utils/ErrorHandler';
 @ApiUnauthorizedResponse({
   description: 'UnauthorisedException: Unauthorised to access resource',
 })
-@Controller('wallet')
+@ApiTags('Wallets')
+@Controller('wallets')
 export class WalletController {
-  constructor(private walletService: WalletService) {}
+  constructor(private readonly walletService: WalletService) {}
 
-  @Get('get-all-user-wallets')
-  @ApiOperation({
-    summary: 'Get all user wallets',
-  })
+  @Get(':id')
+  @ApiOperation({ summary: 'Get wallet by ID' })
+  @ApiParam({ name: 'id', description: 'Wallet ID', type: String })
   @ApiResponse({
     status: 200,
-    description: 'All wallets for a user',
+    description: 'Wallet retrieved successfully',
+    type: Wallet,
   })
-  @ApiBadRequestResponse({
-    description: 'Failed to get all wallets for a user',
+  @ApiResponse({ status: 404, description: 'Wallet not found' })
+  async findOneById(@Param('id') id: ObjectId) {
+    return this.walletService.findOneById(id);
+  }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Get all wallets by user ID' })
+  @ApiParam({ name: 'userId', description: 'User ID', type: String })
+  @ApiResponse({
+    status: 200,
+    description: 'Wallets retrieved successfully',
+    type: [Wallet],
   })
-  @ApiUnauthorizedResponse({
-    description: 'UnauthorisedException: Invalid credentials',
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getAllWalletsByUser(@Param('userId') userId: ObjectId) {
+    return this.walletService.getAllWalletsByUser(userId);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new wallet' })
+  @ApiBody({ type: CreateWalletDTO })
+  @ApiResponse({
+    status: 201,
+    description: 'Wallet created successfully',
+    type: Wallet,
   })
-  async getUserWallets(@Res() res, @Req() req) {
-    try {
-      const id = req.user.id;
-      const result = await this.walletService.getAllWalletsByUser(id);
-      return res.status(HttpStatus.CREATED).json({
-        message: 'User wallets retrieved successfully!',
-        result,
-      });
-    } catch (error) {
-      if (error instanceof ErrorHandler) {
-        // Handle the "not found" exception
-        return res.status(HttpStatus.NOT_FOUND).json({
-          message: error.message, // Send the error message to the client
-        });
-      } else {
-        Logger.error(error);
-        throw new HttpException(
-          'Something went wrong, please try again later',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-    }
+  @ApiResponse({ status: 400, description: 'Invalid input' })
+  async createWallet(@Req() req, @Body() createWalletDTO: CreateWalletDTO) {
+    const userId = req.user.id; // Assuming user ID is stored in request.user
+    const walletData = { ...createWalletDTO, user: userId }; // Ensure the user field is set
+    return this.walletService.createWallet(walletData);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all wallets for the signed-in user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Wallets retrieved successfully',
+    type: [Wallet],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getAllWalletsForSignedInUser(@Req() req) {
+    const userId = req.user.id; // Assuming user ID is stored in request.user
+    const objectId = new Types.ObjectId(userId);
+    return this.walletService.getAllWalletsByUser(objectId);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update an existing wallet' })
+  @ApiParam({ name: 'id', description: 'Wallet ID', type: String })
+  @ApiBody({ type: UpdateWalletDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Wallet updated successfully',
+    type: Wallet,
+  })
+  @ApiResponse({ status: 404, description: 'Wallet not found' })
+  async updateWallet(
+    @Param('id') id: ObjectId,
+    @Body() updateWalletDTO: UpdateWalletDTO,
+  ) {
+    return this.walletService.updateWallet(id, updateWalletDTO);
+  }
+
+  @Delete('user/:userId')
+  @ApiOperation({ summary: 'Delete all wallets by user ID' })
+  @ApiParam({ name: 'userId', description: 'User ID', type: String })
+  @ApiResponse({ status: 200, description: 'Wallets deleted successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async deleteAllWalletsByUser(@Param('userId') userId: ObjectId) {
+    return this.walletService.deleteAllWalletsByUser(userId);
+  }
+
+  @Post('fund')
+  @ApiOperation({ summary: 'Fund a wallet' })
+  @ApiBody({ type: CreateWalletDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Wallet funded successfully',
+    type: Wallet,
+  })
+  @ApiResponse({ status: 404, description: 'Wallet not found' })
+  async fundWallet(@Req() req, @Body() fundWalletDTO: CreateWalletDTO) {
+    const userId = req.user.id; // Assuming user ID is stored in request.user
+    return this.walletService.fundWallet(userId, fundWalletDTO);
   }
 }
