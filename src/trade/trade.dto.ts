@@ -145,4 +145,8 @@ export class BuyTradeDTO {
   @ApiProperty({ description: 'Paid Currency' })
   @IsOptional()
   readonly paid_currency: string;
+
+  @ApiProperty({ description: 'Paid Currency' })
+  @IsOptional()
+  readonly status: string;
 }

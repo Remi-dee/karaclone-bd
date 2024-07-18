@@ -115,9 +115,12 @@ export class BuyTrade extends Document {
 
   @Prop({ required: false })
   purchase_currency: string;
-  
+
   @Prop({ required: false })
   paid_currency: string;
+
+  @Prop({ required: false })
+  rate: string;
 }
 
 export const TradeSchema = SchemaFactory.createForClass(Trade);

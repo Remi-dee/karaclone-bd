@@ -89,7 +89,6 @@ export class CurrencyPairService {
       .findOne({ base_currency: baseCurrency, quote_currency: quoteCurrency })
       .exec();
 
-    
     if (!currencyPair) {
       throw new NotFoundException(
         `Exchange rate not found for ${baseCurrency} to ${quoteCurrency}`,

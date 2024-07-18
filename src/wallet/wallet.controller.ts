@@ -23,7 +23,6 @@ import { CreateWalletDTO, UpdateWalletDTO } from './wallet.dto';
 import { ObjectId } from 'mongodb';
 import { Wallet } from './wallet.schema';
 import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
-import { Types } from 'mongoose';
 
 @ApiBearerAuth('Authorization')
 @ApiTags('Wallet')
@@ -87,8 +86,8 @@ export class WalletController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getAllWalletsForSignedInUser(@Req() req) {
     const userId = req.user.id; // Assuming user ID is stored in request.user
-    const objectId = new Types.ObjectId(userId);
-    return this.walletService.getAllWalletsByUser(objectId);
+
+    return this.walletService.getAllWalletsByUser(userId);
   }
 
   @Put(':id')

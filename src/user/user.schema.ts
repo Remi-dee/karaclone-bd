@@ -95,6 +95,7 @@ export class User extends BaseSchema {
 
   @Prop({ required: false })
   resetPasswordExpires: Date;
+
   @Prop({ type: ObjectId, ref: 'KYC' })
   kyc: string;
 

@@ -92,8 +92,9 @@ export class TradeService {
       beneficiary_account: buyTradeData.beneficiary_account,
       beneficiary_bank: buyTradeData.beneficiary_bank,
       payment_method: buyTradeData.payment_method,
-      status: 'completed', // Set the initial status
+      // Set the initial status
       price,
+      rate: trade.rate,
     });
 
     await buyTrade.save();

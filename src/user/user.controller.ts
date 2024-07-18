@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
 import { UserService } from './user.service';
-import { CreateUserDTO, Verify2FADTO } from './user.dto';
+import { CreateUserDTO, UpdateUserDTO, Verify2FADTO } from './user.dto';
 import { User } from './user.schema';
 import ErrorHandler from '../utils/ErrorHandler';
 
@@ -219,6 +219,44 @@ export class UserController {
       } else {
         return next(new ErrorHandler(error.message, 400));
       }
+    }
+  }
+
+  @Post('update-profile')
+  @ApiOperation({ summary: 'Update user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile updated successfully',
+    type: User,
+  })
+  @ApiBadRequestResponse({ description: 'Failed to update user profile' })
+  @ApiUnauthorizedResponse({
+    description: 'UnauthorisedException: Invalid credentials',
+  })
+  async updateUserProfile(
+    @Req() req,
+    @Res() res,
+    @Body() updateUserDto: UpdateUserDTO,
+  ) {
+    const id = req.user.id;
+
+    try {
+      console.log('User ID from request:', id);
+      console.log('Update User DTO:', updateUserDto);
+
+      const updatedUser = await this.userService.updateUserProfile(
+        id,
+        updateUserDto,
+      );
+      console.log('Updated User:', updatedUser);
+
+      res.status(200).json({
+        message: 'User profile updated successfully',
+        user: updatedUser,
+      });
+    } catch (error: any) {
+      console.error('Error:', error.message);
+      res.status(error.status || 400).json({ message: error.message });
     }
   }
 }

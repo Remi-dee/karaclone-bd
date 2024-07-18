@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { User, UserDocument } from './user.schema';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { CreateUserDTO, IUserDetails, Verify2FADTO } from './user.dto';
+import {
+  CreateUserDTO,
+  IUserDetails,
+  UpdateUserDTO,
+  Verify2FADTO,
+} from './user.dto';
 import { ObjectId } from 'mongodb';
 import * as qrcode from 'qrcode';
 import * as speakeasy from 'speakeasy';
@@ -142,6 +147,32 @@ export class UserService {
       return verified;
     } catch (error) {
       throw new Error('Error verifying TOTP');
+    }
+  }
+
+  async updateUserProfile(
+    userId: ObjectId,
+    updateUserDto: UpdateUserDTO,
+  ): Promise<User> {
+    console.log('User ID:', userId);
+    console.log('Update DTO:', updateUserDto);
+
+    try {
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        userId,
+        { $set: updateUserDto },
+        { new: true, runValidators: true },
+      );
+
+      if (!updatedUser) {
+        throw new ErrorHandler('User not found', 404);
+      }
+
+      console.log('Updated User:', updatedUser);
+      return updatedUser.save();
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw new ErrorHandler('Failed to update user profile', 500);
     }
   }
 }
