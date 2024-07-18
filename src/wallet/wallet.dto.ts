@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateWalletDTO {
   @ApiProperty({ description: 'Wallet currency code' })
@@ -9,6 +10,10 @@ export class CreateWalletDTO {
   @ApiProperty({ description: 'Wallet escrow balance' })
   @IsNotEmpty({ message: 'Escrow balance is required' })
   readonly escrow_balance: number;
+
+  @ApiProperty({ description: 'User id' })
+  // @IsNotEmpty({ message: 'is required' })
+  user: Types.ObjectId;
 }
 
 export class UpdateWalletDTO {
