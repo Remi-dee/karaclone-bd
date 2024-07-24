@@ -20,6 +20,7 @@ import { KycModule } from './kyc/kyc.module';
 import { MonoModule } from './mono/mono.module';
 import { TrueLayerModule } from './truelayer/truelayer.module';
 import { UserTransactionsModule } from './users-transactions/user-transactions.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { UserTransactionsModule } from './users-transactions/user-transactions.m
     MonoModule,
     TrueLayerModule,
     UserTransactionsModule,
+    NotificationModule
   ],
   controllers: [AppController],
   providers: [AppService],

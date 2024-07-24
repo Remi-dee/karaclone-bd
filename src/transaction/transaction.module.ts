@@ -10,9 +10,13 @@ import { WalletService } from '../wallet/wallet.service';
 import { WalletModule } from '../wallet/wallet.module';
 import { Wallet, WalletSchema } from '../wallet/wallet.schema';
 import { Transaction, TransactionSchema } from './transaction.schema';
+import { UserTransactionsModule } from 'src/users-transactions/user-transactions.module';
+import { TradeModule } from 'src/trade/trade.module';
 
 @Module({
   imports: [
+    UserTransactionsModule,
+    TradeModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }]),
     MongooseModule.forFeature([

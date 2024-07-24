@@ -158,8 +158,8 @@ export class UserService {
     console.log('Update DTO:', updateUserDto);
 
     try {
-      const updatedUser = await this.userModel.findByIdAndUpdate(
-        userId,
+      const updatedUser = await this.userModel.findOneAndUpdate(
+        { _id: userId }, // Use criteria to find the user by ID
         { $set: updateUserDto },
         { new: true, runValidators: true },
       );
@@ -169,7 +169,7 @@ export class UserService {
       }
 
       console.log('Updated User:', updatedUser);
-      return updatedUser.save();
+      return updatedUser; // No need to call .save() again, findOneAndUpdate already returns the updated document
     } catch (error) {
       console.error('Error updating user:', error);
       throw new ErrorHandler('Failed to update user profile', 500);

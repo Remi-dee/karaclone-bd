@@ -20,28 +20,28 @@ export class TransactionService {
     private walletService: WalletService,
   ) {}
 
-  async fundWalletService(
-    id: ObjectId,
-    fundWalletBody: FundWalletDTO,
-  ): Promise<any> {
-    const { currency_code, amount } = fundWalletBody;
-    const user = await this.userService.findOneById(id);
+  // async fundWalletService(
+  //   id: ObjectId,
+  //   fundWalletBody: FundWalletDTO,
+  // ): Promise<any> {
+  //   const { currency_code, amount } = fundWalletBody;
+  //   const user = await this.userService.findOneById(id);
 
-    if (!user) {
-      throw new ErrorHandler('User not found', 400);
-    }
+  //   if (!user) {
+  //     throw new ErrorHandler('User not found', 400);
+  //   }
 
-    const fundWalletDTO = {
-      currency_code,
-      escrow_balance: amount,
-    } as CreateWalletDTO;
+  //   const fundWalletDTO = {
+  //     currency_code,
+  //     amount,
+  //   };
 
-    const fundedWallet = await this.walletService.fundWallet(
-      user._id,
-      fundWalletDTO,
-    );
-    return fundedWallet;
-  }
+  //   const fundedWallet = await this.walletService.fundWallet(
+  //     user._id,
+  //     fundWalletDTO,
+  //   );
+  //   return fundedWallet;
+  // }
 }
 
 //   // fund wallet with local currency

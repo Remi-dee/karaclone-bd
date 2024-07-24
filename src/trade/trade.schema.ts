@@ -27,7 +27,7 @@ export class Trade extends BaseSchema {
   amount: number;
 
   @Prop({ required: true })
-  minimumBid: string;
+  minimum_bid: string;
 
   @Prop({ required: false })
   account_name: string;
@@ -50,16 +50,16 @@ export class Trade extends BaseSchema {
   @Prop({ required: false })
   additional_information?: string;
 
-  @Prop({ required: true, unique: true })
-  tradeId: string;
+  @Prop({ required: true })
+  trade_id: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   readonly beneficiary_name: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   readonly beneficiary_account: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   readonly beneficiary_bank: string;
 
   @Prop({ required: true })
@@ -69,7 +69,7 @@ export class Trade extends BaseSchema {
   sold: number;
 
   @Prop({ type: ObjectId, ref: 'User Id' })
-  userId: ObjectId;
+  user_id: ObjectId;
 
   @Prop({ required: true }) // Add the price property
   price: number;
@@ -81,7 +81,7 @@ export class BuyTrade extends Document {
   transaction_id: string;
 
   @Prop({ required: true })
-  userId: ObjectId;
+  user_id: ObjectId;
 
   @Prop({ required: true })
   purchase: number;

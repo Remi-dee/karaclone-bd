@@ -9,11 +9,21 @@ export class CreateWalletDTO {
 
   @ApiProperty({ description: 'Wallet escrow balance' })
   @IsNotEmpty({ message: 'Escrow balance is required' })
-  readonly escrow_balance: number;
+  readonly amount: number;
 
   @ApiProperty({ description: 'User id' })
   // @IsNotEmpty({ message: 'is required' })
   user: Types.ObjectId;
+
+  // @ApiProperty({ description: 'User id' })
+  // @IsOptional()
+  // // @IsNotEmpty({ message: 'is required' })
+  // payment_method: string;
+
+  // @ApiProperty({ description: 'User id' })
+  // @IsOptional()
+  // // @IsNotEmpty({ message: 'is required' })
+  // transaction_fee: string;
 }
 
 export class UpdateWalletDTO {

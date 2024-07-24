@@ -21,7 +21,7 @@ export class CreateTradeDTO {
 
   @ApiProperty({ description: 'Minimum Bid' })
   @IsNotEmpty({ message: 'Minimum bid is required' })
-  readonly minimumBid: string;
+  readonly minimum_bid: string;
 
   @ApiProperty({ description: 'Bank Name' })
   @IsOptional()
@@ -37,7 +37,7 @@ export class CreateTradeDTO {
 
   @ApiProperty({ description: 'Transaction Fee' })
   @IsNotEmpty({ message: 'Transaction Fee is required' })
-  transaction_fee: string;
+  transaction_fee: number;
 
   @ApiProperty({ description: 'Vat Fee' })
   @IsNotEmpty({ message: 'Vat Fee is required' })
@@ -99,7 +99,7 @@ export class UpdateTradeDTO {
 export class BuyTradeDTO {
   @ApiProperty({ description: 'Trade ID' })
   @IsNotEmpty({ message: 'Trade ID is required' })
-  readonly tradeId: string;
+  readonly trade_id: string;
 
   @ApiProperty({ description: 'Amount to Buy' })
   @IsNotEmpty({ message: 'Amount to buy is required' })
@@ -146,7 +146,14 @@ export class BuyTradeDTO {
   @IsOptional()
   readonly paid_currency: string;
 
-  @ApiProperty({ description: 'Paid Currency' })
+  @ApiProperty({ description: 'Status' })
   @IsOptional()
-  readonly status: string;
+  status: string;
+
+  @ApiProperty({ description: 'Transaction Fee' })
+  @IsOptional()
+  readonly transaction_fee: number;
+  @ApiProperty({ description: 'rate' })
+  @IsOptional()
+  readonly rate: string;
 }

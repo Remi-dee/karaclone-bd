@@ -233,11 +233,7 @@ export class UserController {
   @ApiUnauthorizedResponse({
     description: 'UnauthorisedException: Invalid credentials',
   })
-  async updateUserProfile(
-    @Req() req,
-    @Res() res,
-    @Body() updateUserDto: UpdateUserDTO,
-  ) {
+  async updateUserProfile(@Req() req, @Res() res, @Body() updateUserDto) {
     const id = req.user.id;
 
     try {

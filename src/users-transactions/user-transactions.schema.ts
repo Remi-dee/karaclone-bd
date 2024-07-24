@@ -50,18 +50,20 @@ export class UserTransaction {
   user_id: ObjectId;
 
   @Prop({ required: false })
-  amount_exchanged: number;
+  amount_exchanged: string;
 
   @Prop({ required: false })
-  amount_reversed: number;
+  amount_reversed: string;
 
   @Prop({ required: false })
-  amount_deposited: number;
+  amount_deposited: string;
 
   @Prop({ required: false })
-  amount_sold: number;
+  amount_sold: string;
   @Prop({ required: false })
-  amount_received: number;
+  amount_received: string;
+  @Prop({ required: false })
+  rate: string;
 }
 
 export const UserTransactionSchema =

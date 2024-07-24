@@ -5,11 +5,17 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TransactionModule } from '../transaction/transaction.module';
 import { User, UserSchema } from '../user/user.schema';
 import { WalletController } from './wallet.controller';
+import { UserTransactionsModule } from 'src/users-transactions/user-transactions.module';
+
+import { TradeModule } from 'src/trade/trade.module';
 
 @Module({
   imports: [
+    UserTransactionsModule,
+    TradeModule,
     MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+
     forwardRef(() => TransactionModule),
   ],
   providers: [WalletService],

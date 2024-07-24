@@ -15,7 +15,7 @@ import {
 @Injectable()
 export class UserTransactionsService {
   constructor(
-    @InjectModel(UserTransaction.name)
+    @InjectModel('UserTransaction')
     private userTransactionsModel: Model<UserTransactionDocument>,
   ) {}
 

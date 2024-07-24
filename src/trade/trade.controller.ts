@@ -335,4 +335,25 @@ export class TradeController {
       );
     }
   }
+
+  @Get('drop-index')
+  async dropIndex(): Promise<string> {
+    await this.tradeService.dropTradeIdIndex();
+    return 'Index dropped successfully';
+  }
+
+  @Get('drop-indexes')
+  async dropIndexes(): Promise<string> {
+    await this.tradeService.dropIndexes();
+    return 'Indexes dropped successfully';
+  }
+
+  @Get('list-indexes')
+  async listIndexes(): Promise<string> {
+    await this.tradeService.listIndexes();
+    return 'Indexes listed in console';
+  }
+
+  
+ 
 }

@@ -8,19 +8,24 @@ import { User, UserSchema } from 'src/user/user.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Beneficiary, BeneficiarySchema } from './beneficiary.schema';
 
+import { UserTransactionsModule } from 'src/users-transactions/user-transactions.module';
+
+import { NotificationModule } from 'src/notification/notification.module';
+
 @Module({
   imports: [
     AuthenticationModule,
-
+    UserTransactionsModule,
+    NotificationModule,
     MongooseModule.forFeature([
       { name: 'Trade', schema: TradeSchema },
       { name: User.name, schema: UserSchema },
       { name: Beneficiary.name, schema: BeneficiarySchema },
       { name: 'BuyTrade', schema: BuyTradeSchema }, // Register BuyTrade schema
-      ,
     ]),
   ],
   providers: [TradeService],
   controllers: [TradeController],
+  exports: [TradeService],
 })
 export class TradeModule {}

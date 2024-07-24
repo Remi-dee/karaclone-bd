@@ -2,7 +2,7 @@
 import { PartialType } from '@nestjs/swagger';
 import { IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 
 export class CreateUserTransactionDto {
   @ApiProperty({
@@ -71,7 +71,7 @@ export class CreateUserTransactionDto {
     example: 2134759278374,
   })
   @IsNumber()
-  readonly beneficiary_account: number;
+  readonly beneficiary_account: string;
 
   @ApiProperty({
     description: 'Beneficiary bank for the transaction',
@@ -94,7 +94,7 @@ export class CreateUserTransactionDto {
   })
   @IsString()
   @IsOptional()
-  user_id: ObjectId;
+  user_id: Types.ObjectId;
 
   @ApiProperty({
     description: 'Amount exchanged',
@@ -102,7 +102,7 @@ export class CreateUserTransactionDto {
   })
   @IsNumber()
   @IsOptional()
-  amount_exchanged: number;
+  amount_exchanged: string;
 
   @ApiProperty({
     description: 'Amount reserved',
@@ -110,7 +110,7 @@ export class CreateUserTransactionDto {
   })
   @IsNumber()
   @IsOptional()
-  amount_reversed: number;
+  amount_reversed: string;
 
   @ApiProperty({
     description: 'Amount deposited',
@@ -118,7 +118,7 @@ export class CreateUserTransactionDto {
   })
   @IsNumber()
   @IsOptional()
-  amount_deposited: number;
+  amount_deposited: string;
 
   @ApiProperty({
     description: 'Amount sold',
@@ -126,7 +126,7 @@ export class CreateUserTransactionDto {
   })
   @IsNumber()
   @IsOptional()
-  amount_sold: number;
+  amount_sold: string;
 
   @ApiProperty({
     description: 'Amount received',
@@ -134,7 +134,10 @@ export class CreateUserTransactionDto {
   })
   @IsNumber()
   @IsOptional()
-  amount_received: number;
+  amount_received: string;
+
+  @IsOptional()
+  rate: string;
 }
 
 export class UpdateUserTransactionDto extends PartialType(

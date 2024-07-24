@@ -104,45 +104,45 @@ export class ResetPasswordDTO {
 
 export class UpdateUserDTO {
   @ApiProperty({ description: 'Name of user', required: false })
-  readonly name?: string;
+  name: string;
 
   @ApiProperty({ description: 'Gender of user', required: false })
-  readonly gender?: string;
+  readonly gender: string;
 
   @ApiProperty({ description: 'Email of user', required: false })
   // @IsEmail()
-  readonly email?: string;
+  readonly email: string;
 
   @ApiProperty({ description: 'Phone number of user', required: false })
-  readonly phone?: string;
+  readonly phone: string;
 
   @ApiProperty({ description: 'User ID document', required: false })
-  user_id_card?: string;
+  user_id_card: string;
 
   @ApiProperty({ description: 'Business name of user', required: false })
-  readonly business_name?: string;
+  readonly business_name: string;
 
   @ApiProperty({ description: 'Business address of user', required: false })
-  readonly business_address?: string;
+  readonly business_address: string;
 
   @ApiProperty({ description: 'Business email of user', required: false })
-  readonly business_email?: string;
+  readonly business_email: string;
 
   @ApiProperty({ description: 'Business line of user', required: false })
-  readonly business_line?: string;
+  readonly business_line: string;
 
   @ApiProperty({ description: 'Date of birth of user', required: false })
-  readonly date_of_birth?: string;
+  readonly date_of_birth: string;
 
   @ApiProperty({ description: 'City of user', required: false })
-  readonly city?: string;
+  readonly city: string;
 
   @ApiProperty({ description: 'State of user', required: false })
-  readonly state?: string;
+  readonly state: string;
 
   @ApiProperty({ description: 'Zip code of user', required: false })
-  readonly zip?: string;
+  readonly zip: string;
 
   @ApiProperty({ description: 'Country code of user', required: false })
-  readonly country_code?: string;
+  readonly country_code: string;
 }
