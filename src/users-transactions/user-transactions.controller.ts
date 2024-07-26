@@ -12,6 +12,7 @@ import {
   HttpStatus,
   Res,
   Query,
+  Req,
 } from '@nestjs/common';
 
 import {
@@ -52,7 +53,6 @@ export class UserTransactionsController {
   ): Promise<UserTransaction> {
     createTransactionDto.user_id = req.user.id;
 
-    console.log('our user t is:', createTransactionDto);
     return res.status(HttpStatus.OK).json({
       message: 'Transaction created successfully',
       transaction:
@@ -70,9 +70,16 @@ export class UserTransactionsController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Res() res: any,
+    @Req() req: any,
   ): Promise<any> {
+    const user_id = req.user.id;
     const { transactions, totalItems } =
-      await this.userTransactionsService.findAll(Number(page), Number(limit));
+      await this.userTransactionsService.findAll(
+        user_id,
+        Number(page),
+        Number(limit),
+      );
+    console.log('our user id', user_id);
     return res.status(HttpStatus.OK).json({
       message: 'Transactions retrieved successfully',
       transactions,

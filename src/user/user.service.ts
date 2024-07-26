@@ -175,4 +175,23 @@ export class UserService {
       throw new ErrorHandler('Failed to update user profile', 500);
     }
   }
+
+  async enableTwoFA(userId): Promise<void> {
+    console.log('our user id 2 is', userId);
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new ErrorHandler('User not found', 404);
+    }
+    user.isTwoFactorEnabled = true;
+    await user.save();
+  }
+
+  async disableTwoFA( userId ): Promise<void> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new ErrorHandler('User not found', 404);
+    }
+    user.isTwoFactorEnabled = false;
+    await user.save();
+  }
 }

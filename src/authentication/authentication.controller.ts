@@ -15,6 +15,7 @@ import {
   IActivationRequest,
   LoginUserDTO,
   RegisterUserDTO,
+  VerifyTwoFADTO,
 } from './authentication.dto';
 import { UserService } from '../user/user.service';
 
@@ -131,6 +132,25 @@ export class AuthenticationController {
         return next(new ErrorHandler(error.message, 400));
       }
     }
+  }
+
+  @Post('verify-2fa')
+  @ApiOperation({ summary: 'Verify 2FA' })
+  @ApiResponse({
+    status: 200,
+    description: '2FA verification successful',
+  })
+  @ApiBadRequestResponse({
+    description: '2FA verification failed',
+  })
+  async verifyTwoFA(
+    @Body() verifyTwoFADto: VerifyTwoFADTO,
+    @Res() res: any,
+  ): Promise<any> {
+    console.log('verify dto is', verifyTwoFADto);
+    const { userId, code } = verifyTwoFADto;
+    const result = await this.authService.verifyTwoFA(userId, code);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @Post('forgot-password')

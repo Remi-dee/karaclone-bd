@@ -29,13 +29,16 @@ export class UserTransactionsService {
   }
 
   async findAll(
+    user_id: string,
     page: number,
     limit: number,
   ): Promise<{ transactions: UserTransaction[]; totalItems: number }> {
     const skip = (page - 1) * limit;
-    const totalItems = await this.userTransactionsModel.countDocuments().exec();
+    const totalItems = await this.userTransactionsModel
+      .countDocuments({ user_id })
+      .exec();
     const transactions = await this.userTransactionsModel
-      .find()
+      .find({ user_id })
       .skip(skip)
       .limit(limit)
       .exec();

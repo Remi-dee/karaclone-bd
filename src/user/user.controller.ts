@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
 import { UserService } from './user.service';
-import { CreateUserDTO, UpdateUserDTO, Verify2FADTO } from './user.dto';
+import { CreateUserDTO, Verify2FADTO } from './user.dto';
 import { User } from './user.schema';
 import ErrorHandler from '../utils/ErrorHandler';
 
@@ -254,5 +254,58 @@ export class UserController {
       console.error('Error:', error.message);
       res.status(error.status || 400).json({ message: error.message });
     }
+  }
+
+  @Post('enable-email-2fa')
+  @ApiOperation({ summary: 'Enable 2FA' })
+  @ApiResponse({ status: 200, description: '2FA enabled successfully' })
+  @ApiBadRequestResponse({ description: 'Failed to enable 2FA' })
+  async enableTwoFA(@Req() req: any, @Res() res: any, @Next() next) {
+    const userId = req.user.id;
+    try {
+      console.log('our user id is', userId);
+      await this.userService.enableTwoFA(userId);
+
+      return res
+        .status(HttpStatus.OK)
+        .json({ message: '2FA enabled successfully' });
+    } catch (error: any) {
+      if (error instanceof ErrorHandler) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: error.message });
+      } else {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  }
+
+  @Post('disable-2fa')
+  @ApiOperation({ summary: 'Disable 2FA' })
+  @ApiResponse({ status: 200, description: '2FA disabled successfully' })
+  @ApiBadRequestResponse({ description: 'Failed to disable 2FA' })
+  async disableTwoFA(@Req() req: any, @Res() res: any, @Next() next) {
+    const userId = req.user.id;
+    try {
+      await this.userService.disableTwoFA(userId);
+      return res
+        .status(HttpStatus.OK)
+        .json({ message: '2FA disabled successfully' });
+    } catch (error: any) {
+      if (error instanceof ErrorHandler) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: error.message });
+      } else {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  }
+
+  @Get('two-factor-status')
+  async getTwoFactorStatus(@Req() req) {
+    const userId = req.user.id;
+    const user = await this.userService.findOneById(userId);
+    return { isTwoFactorEnabled: user.isTwoFactorEnabled };
   }
 }

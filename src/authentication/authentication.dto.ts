@@ -93,3 +93,25 @@ export class LoginUserDTO {
   })
   readonly password: string;
 }
+
+export class VerifyTwoFADTO {
+  @ApiProperty({ description: 'User Password' })
+  @IsNotEmpty({ message: 'User id is required' })
+  userId: string;
+
+  @ApiProperty({ description: 'Code' })
+  @IsNotEmpty({ message: 'Code is required' })
+  code: string;
+}
+
+export class EnableTwoFADTO {
+  @ApiProperty({ description: 'User Password' })
+  @IsNotEmpty({ message: 'User id is required' })
+  userId: string;
+}
+
+export class DisableTwoFADTO {
+  @ApiProperty({ description: 'User Password' })
+  @IsNotEmpty({ message: 'User id is required' })
+  userId: string;
+}

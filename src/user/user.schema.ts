@@ -14,6 +14,15 @@ export class User extends BaseSchema {
   @Prop({ required: false })
   name: string;
 
+  @Prop({ type: Boolean, default: false })
+  isTwoFactorEnabled: boolean;
+
+  @Prop({ type: String, required: false })
+  twoFACode?: string;
+
+  @Prop({ type: Date, required: false })
+  twoFACodeExpiry?: Date;
+
   @ApiProperty({ example: 'john.doe@gmail.com', description: 'Email of user' })
   @Prop({ required: true, unique: true })
   email: string;

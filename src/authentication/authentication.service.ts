@@ -42,20 +42,52 @@ export class AuthenticationService {
     }
   }
 
-  async login(user: LoginUserDTO): Promise<IAuthenticationResponse> {
+  async login(user: LoginUserDTO): Promise<any> {
     const userDetails = await this.validateUser(user.email, user.password);
 
-    if (!userDetails)
+    if (!userDetails) {
       throw new ErrorHandler('Please confirm your login details', 400);
+    }
 
-    const payload = {
-      email: userDetails.email,
-      sub: userDetails._id,
-    };
-    return {
-      user: this.userService.getUserDetails(userDetails),
-      accessToken: this.jwtService.sign(payload),
-    };
+    if (userDetails.isTwoFactorEnabled) {
+      // Generate a unique 2FA code
+      const twoFACode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Store the 2FA code and expiry time (e.g., 5 minutes from now)
+      userDetails.twoFACode = twoFACode;
+      userDetails.twoFACodeExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+      // Save the user details
+      await userDetails.save();
+
+      // Send the 2FA code to the user's email
+      const data = { user: { name: userDetails.name }, twoFACode };
+      await this.mailService.sendMail({
+        email: userDetails.email,
+        subject: 'Your 2FA Login Code',
+        template: 'two-fa-mail',
+        context: data,
+      });
+
+      return {
+        message:
+          'A 2FA code has been sent to your email. Please verify to continue.',
+        isTwoFactorEnabled: true,
+        user: this.userService.getUserDetails(userDetails),
+      };
+    } else {
+      const payload = {
+        email: userDetails.email,
+        sub: userDetails._id,
+      };
+
+      return {
+        message: 'Login Successful',
+        isTwoFactorEnabled: false,
+        accessToken: this.jwtService.sign(payload),
+        user: this.userService.getUserDetails(userDetails),
+      };
+    }
   }
 
   async register(regBody: RegisterUserDTO) {
@@ -240,5 +272,39 @@ export class AuthenticationService {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
+  }
+
+  async verifyTwoFA(
+    userId: string,
+    code: string,
+  ): Promise<IAuthenticationResponse> {
+    console.log('here is user id', userId);
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new ErrorHandler('User not found', 404);
+    }
+
+    if (
+      !user.twoFACode ||
+      user.twoFACode !== code ||
+      user.twoFACodeExpiry < new Date()
+    ) {
+      throw new ErrorHandler('Invalid or expired 2FA code', 400);
+    }
+
+    // Clear the 2FA code and expiry
+    user.twoFACode = undefined;
+    user.twoFACodeExpiry = undefined;
+    await user.save();
+
+    const payload = {
+      email: user.email,
+      sub: user._id,
+    };
+
+    return {
+      user: this.userService.getUserDetails(user),
+      accessToken: this.jwtService.sign(payload),
+    };
   }
 }
