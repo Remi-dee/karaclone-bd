@@ -21,6 +21,7 @@ import { MonoModule } from './mono/mono.module';
 import { TrueLayerModule } from './truelayer/truelayer.module';
 import { UserTransactionsModule } from './users-transactions/user-transactions.module';
 import { NotificationModule } from './notification/notification.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { NotificationModule } from './notification/notification.module';
     MonoModule,
     TrueLayerModule,
     UserTransactionsModule,
-    NotificationModule
+    NotificationModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
