@@ -158,7 +158,7 @@ export class TrueLayerService {
   async initiateWithdrawal(
     withdrawalRequest: WithdrawalRequestDTO,
   ): Promise<any> {
-    const path = '/v1/withdrawals';
+    const path = '/v3/payouts';
     const method = 'POST';
 
     // Ensure transaction_id is set
@@ -170,7 +170,7 @@ export class TrueLayerService {
 
     try {
       const response = await axios.post(
-        `${this.PAY_DIRECT_URL}${path}`,
+        `${this.BASE_URL}${path}`,
         withdrawalRequest,
         {
           headers,

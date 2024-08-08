@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { BaseSchema } from './../app.schema';
 import { E_USER_ROLE, E_USER_TYPE } from './user.enum';
 import { Wallet } from '../wallet/wallet.schema';
@@ -122,6 +122,9 @@ export class User extends BaseSchema {
 
   @Prop({ required: false })
   country_code: string;
+
+  @Prop({ required: false })
+  conversationId:string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

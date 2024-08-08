@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-
   IsIBAN,
   IsIn,
   IsInt,
@@ -33,7 +32,7 @@ class Filter {
   countries: string[];
 }
 
-class Beneficiary {
+class PaymentBeneficiary {
   @ApiProperty({
     description: 'The type of beneficiary',
     example: 'merchant_account',
@@ -86,8 +85,8 @@ class PaymentMethod {
     description: 'Beneficiary details',
   })
   @ValidateNested()
-  @Type(() => Beneficiary)
-  beneficiary: Beneficiary;
+  @Type(() => PaymentBeneficiary)
+  beneficiary: PaymentBeneficiary;
 }
 
 class Address {
@@ -235,36 +234,28 @@ export class GenerateHeadersDTO {
 }
 
 export class WithdrawalRequestDTO {
-  @ApiProperty({
-    description: 'UUID identifying the user for the current client',
-    example: '4e9eaf16-8334-43d5-b97c-3d64a1f1d842',
-    required: false,
-  })
-  @IsUUID()
-  @IsOptional()
-  transaction_id: string;
+  // @ApiProperty({
+  //   description: 'UUID identifying the user for the current client',
+  //   example: '4e9eaf16-8334-43d5-b97c-3d64a1f1d842',
+  //   required: false,
+  // })
+  // @IsUUID()
+  // @IsOptional()
+  // transaction_id: string;
 
   @ApiProperty({
-    description: 'The beneficiary name as it should appear against the account',
-    example: 'John Doe',
+    description: 'The beneficiary details',
   })
-  @IsString()
-  beneficiary_name: string;
+  @ValidateNested()
+  @Type(() => WithdrawBeneficiary)
+  beneficiary: WithdrawBeneficiary;
 
   @ApiProperty({
-    description: 'IBAN of the beneficiary account',
-    example: 'GB33BUKB20201555555555',
+    description: 'The address of the user',
   })
-  @IsIBAN()
-  beneficiary_iban: string;
-
-  @ApiProperty({
-    description:
-      'The reference that will appear in the beneficiary account against the payment',
-    example: 'Payment for services',
-  })
-  @IsString()
-  beneficiary_reference: string;
+  @ValidateNested()
+  @Type(() => Address)
+  address: Address;
 
   @ApiProperty({
     description: 'Currency of the payment',
@@ -279,6 +270,72 @@ export class WithdrawalRequestDTO {
   })
   @IsInt()
   amount_in_minor: number;
+
+  @ApiProperty({
+    description: 'Payment reference',
+    example: 'Example reference that identifies the payment',
+  })
+  @IsString()
+  reference: string;
+
+  @ApiProperty({
+    description: 'Date of Birth',
+    example: '1991-05-32',
+  })
+  @IsString()
+  date_of_birth: string;
+}
+
+class WithdrawBeneficiary {
+  @ApiProperty({
+    description: 'The type of beneficiary',
+    example: 'external_account',
+  })
+  @IsString()
+  @IsNotEmpty()
+  type: string;
+
+  @ApiProperty({
+    description: 'Account Holder name',
+    example: 'John Sandbridge',
+  })
+  @IsString()
+  @IsNotEmpty()
+  account_holder_name: string;
+
+  @ApiProperty({
+    description: 'The account identifier',
+  })
+  @ValidateNested()
+  @Type(() => AccountIdentifier)
+  @IsNotEmpty()
+  account_identifier: AccountIdentifier;
+}
+
+class AccountIdentifier {
+  @ApiProperty({
+    description: 'Account number type',
+    example: 'sort_code_account_number',
+  })
+  @IsString()
+  @IsOptional()
+  type: string;
+
+  @ApiProperty({
+    description: 'Account number sort code',
+    example: '040668',
+  })
+  @IsString()
+  @IsOptional()
+  sort_code: string;
+
+  @ApiProperty({
+    description: 'Account number',
+    example: '00004668',
+  })
+  @IsString()
+  @IsOptional()
+  account_number: string;
 }
 
 class AccountDTO {

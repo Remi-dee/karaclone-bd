@@ -1,4 +1,14 @@
-import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Req,
+  UseGuards,
+  Delete,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { ChatService } from './chat.service';
 import {
   ApiTags,
@@ -8,7 +18,8 @@ import {
 } from '@nestjs/swagger';
 import { Chat } from './entities/chat.entity';
 import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
-import { CreateMessageDto } from './chat.dto';
+import { conversationIdDto, CreateMessageDto } from './chat.dto';
+import { Types } from 'mongoose';
 
 @ApiBearerAuth('Authorization')
 @UseGuards(JwtAuthGuard)
@@ -23,10 +34,12 @@ export class ChatController {
   async createMessage(@Req() req, @Body() createMessageDto: any) {
     const userId = req.user.id;
     const isSupport = req.user.role === 'admin';
+    const { message, conversationId } = createMessageDto;
     return this.chatService.createMessage(
       userId,
-      createMessageDto.message,
+      message,
       isSupport,
+      conversationId,
     );
   }
 
@@ -37,9 +50,53 @@ export class ChatController {
     description: 'Chat messages retrieved.',
     type: [Chat],
   })
-  async getMessages(@Req() req) {
+  async getMessages(@Req() req, @Query('conversationId') conversationId?: any) {
     const userId = req.user.id;
-    console.log('this is user id', userId);
-    return this.chatService.getMessages(userId);
+    const conversationObjectId = conversationId ? conversationId : undefined;
+    return this.chatService.getMessages(userId, conversationObjectId);
+  }
+
+  @Get('conversations')
+  @ApiOperation({ summary: 'Get all conversation IDs' })
+  @ApiResponse({
+    status: 200,
+    description: 'All conversation IDs retrieved.',
+  })
+  async getAllConversations() {
+    return this.chatService.getAllConversations();
+  }
+
+  @Get('conversation/:conversationId')
+  @ApiOperation({ summary: 'Get chat messages for a specific conversation ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Chat messages retrieved for the conversation.',
+    type: [Chat],
+  })
+  async getMessagesByConversationId(
+    @Param('conversationId') conversationId: string,
+  ) {
+    return this.chatService.getMessagesByConversationId(conversationId);
+  }
+
+  @Delete('all')
+  @ApiOperation({ summary: 'Delete all chat messages' })
+  @ApiResponse({
+    status: 200,
+    description: 'All messages deleted.',
+  })
+  async deleteAllMessages() {
+    return this.chatService.deleteAllMessages();
+  }
+
+  @Delete()
+  @ApiOperation({ summary: 'Delete all messages for the authenticated user' })
+  @ApiResponse({
+    status: 200,
+    description: 'User messages deleted.',
+  })
+  async deleteUserMessages(@Req() req) {
+    const userId = req.user.id;
+    return this.chatService.deleteUserMessages(userId);
   }
 }
