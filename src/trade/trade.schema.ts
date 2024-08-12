@@ -73,6 +73,9 @@ export class Trade extends BaseSchema {
 
   @Prop({ required: true }) // Add the price property
   price: number;
+
+  @Prop({ required: true })
+  beneficiary_id: string;
 }
 
 @Schema({ timestamps: true })
@@ -91,6 +94,9 @@ export class BuyTrade extends Document {
 
   @Prop({ required: true })
   beneficiary_name: string;
+
+  @Prop({ required: true })
+  beneficiary_id: string;
 
   @Prop({ required: true })
   beneficiary_account: string;

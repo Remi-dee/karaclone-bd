@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb';
 
 export type UserTransactionDocument = UserTransaction & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class UserTransaction {
   @Prop({ required: false })
   user_transactionId: string;

@@ -39,6 +39,7 @@ export class UserTransactionsService {
       .exec();
     const transactions = await this.userTransactionsModel
       .find({ user_id })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .exec();
@@ -70,6 +71,13 @@ export class UserTransactionsService {
       .findByIdAndDelete(id)
       .exec();
     return this.formatDate(transaction);
+  }
+
+  async deleteAll(user_id: string): Promise<{ deletedCount: number }> {
+    const result = await this.userTransactionsModel
+      .deleteMany({ user_id })
+      .exec();
+    return { deletedCount: result.deletedCount };
   }
 
   private formatDate(transaction: UserTransactionDocument): UserTransaction {

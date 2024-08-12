@@ -12,10 +12,9 @@ import { TradeModule } from 'src/trade/trade.module';
 @Module({
   imports: [
     UserTransactionsModule,
-    TradeModule,
     MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-
+    forwardRef(() => TradeModule),
     forwardRef(() => TransactionModule),
   ],
   providers: [WalletService],

@@ -121,6 +121,7 @@ export class TradeController {
   @ApiBadRequestResponse({ description: 'Failed to buy a trade' })
   async buyTrade(@Res() res, @Req() req, @Body() buyTradeBody: BuyTradeDTO) {
     try {
+      console.log('here is buy', buyTradeBody);
       const userId = req.user.id;
       const trade = await this.tradeService.buyTrade(userId, buyTradeBody);
       return res.status(HttpStatus.OK).json({
@@ -353,7 +354,4 @@ export class TradeController {
     await this.tradeService.listIndexes();
     return 'Indexes listed in console';
   }
-
-  
- 
 }

@@ -7,5 +7,6 @@ import { TrueLayerController } from './truelayer.controller';
   imports: [ConfigModule],
   controllers: [TrueLayerController],
   providers: [TrueLayerService],
+  exports: [TrueLayerService],
 })
 export class TrueLayerModule {}

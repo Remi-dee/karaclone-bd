@@ -18,6 +18,7 @@ export class TrueLayerService {
   private readonly CLIENT_SECRET: string;
   private readonly SCOPE: string;
   private readonly GRANT_TYPE: string;
+  private readonly MERCHANT_ID: string;
 
   private accessToken: string | null = null;
   private tokenExpiration: number | null = null;
@@ -27,6 +28,7 @@ export class TrueLayerService {
     this.PAY_DIRECT_URL = this.configService.get<string>('PAY_DIRECT_URL');
     this.AUTH_URL = this.configService.get<string>('TRUELAYER_AUTH_URL');
     this.CLIENT_ID = this.configService.get<string>('TRUELAYER_CLIENT_ID');
+    this.MERCHANT_ID = this.configService.get<string>('MERCHANT_ID');
     this.CLIENT_SECRET = this.configService.get<string>(
       'TRUELAYER_CLIENT_SECRET',
     );
@@ -122,6 +124,8 @@ export class TrueLayerService {
     const method = 'POST';
     console.log(`this is 2, ${this.BASE_URL}${path}`);
     const headers = await this.generateHeaders(path, method, paymentRequest);
+
+    
     console.log('this is header,', headers);
     try {
       console.log(`this is 3, ${this.BASE_URL}${path}`);
@@ -162,11 +166,18 @@ export class TrueLayerService {
     const method = 'POST';
 
     // Ensure transaction_id is set
-    if (!withdrawalRequest.transaction_id) {
-      withdrawalRequest.transaction_id = randomUUID();
+    if (!withdrawalRequest.reference) {
+      withdrawalRequest.reference = randomUUID();
     }
 
-    const headers = await this.generateHeaders(path, method, withdrawalRequest);
+    const merchant_id = this.MERCHANT_ID;
+
+    const updatedWithdrawalRequest = { ...withdrawalRequest, merchant_id };
+    const headers = await this.generateHeaders(
+      path,
+      method,
+      updatedWithdrawalRequest,
+    );
 
     try {
       const response = await axios.post(
@@ -257,4 +268,8 @@ export class TrueLayerService {
       }
     }
   }
+
+
+
+  
 }

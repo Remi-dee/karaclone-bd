@@ -1,26 +1,11 @@
+import { Controller, UseGuards } from '@nestjs/common';
 import {
-  Body,
-  Controller,
-  HttpException,
-  HttpStatus,
-  Logger,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
 import { TransactionService } from './transaction.service';
-import ErrorHandler from '../utils/ErrorHandler';
-import { FundWalletDTO } from './transaction.dto';
 
 @ApiBearerAuth('Authorization')
 @ApiTags('Transaction')

@@ -35,3 +35,13 @@ export class UpdateWalletDTO {
   @IsOptional({ message: 'Currency code is optional' })
   readonly escrow_balance: number;
 }
+
+export class DeductWalletDTO {
+  @ApiProperty({ description: 'Wallet currency code' })
+  @IsOptional({ message: 'Currency code is optional' })
+  readonly currency_code: string;
+
+  @ApiProperty({ description: 'Transaction amount' })
+  @IsOptional({ message: 'Currency code is optional' })
+  readonly amount: number;
+}

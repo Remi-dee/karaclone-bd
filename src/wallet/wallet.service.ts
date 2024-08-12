@@ -129,4 +129,25 @@ export class WalletService {
       });
     }
   }
+
+  async deductWallet(
+    userId: Types.ObjectId,
+    amount: number,
+    currencyCode: string,
+    session: any,
+  ): Promise<Wallet | null> {
+    const wallet = await this._walletModel
+      .findOne({ user: userId, currency_code: currencyCode })
+      .session(session);
+    if (!wallet) {
+      throw new Error(`Wallet with currency ${currencyCode} not found`);
+    }
+
+    if (wallet.escrow_balance < amount) {
+      throw new Error('Insufficient funds in the wallet');
+    }
+
+    wallet.escrow_balance -= amount;
+    return await wallet.save();
+  }
 }

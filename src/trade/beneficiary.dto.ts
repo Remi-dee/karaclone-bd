@@ -1,5 +1,7 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { Address } from 'src/truelayer/truelayer.dto';
 
 export class CreateBeneficiaryDTO {
   @ApiProperty({ description: 'Beneficiary Name' })
@@ -33,4 +35,25 @@ export class CreateBeneficiaryDTO {
   @ApiProperty({ description: 'Bank Address' })
   @IsOptional()
   bank_address: string;
+
+  @ApiProperty({ description: 'Sort Code' })
+  @IsOptional()
+  sort_code: string;
+
+  @ApiProperty({ description: 'Iban' })
+  @IsOptional()
+  iban: string;
+
+  @ApiProperty({ description: 'Date of birth' })
+  @IsOptional()
+  date_of_birth: string;
+
+  @ApiProperty({
+    description: 'The user details',
+  })
+  @ValidateNested()
+  @Type(() => Address)
+  address: Address;
 }
+
+

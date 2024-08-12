@@ -1,6 +1,10 @@
 import * as crypto from 'crypto';
 import {
   BadRequestException,
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,6 +17,10 @@ import { Beneficiary } from './beneficiary.schema';
 import { CreateBeneficiaryDTO } from './beneficiary.dto';
 import { UserTransactionsService } from 'src/users-transactions/user-transactions.service';
 import { NotificationService } from 'src/notification/notification.service';
+import { randomUUID } from 'crypto';
+import { WithdrawalRequestDTO } from 'src/truelayer/truelayer.dto';
+import { TrueLayerService } from 'src/truelayer/truelayer.service';
+import { WalletService } from 'src/wallet/wallet.service';
 
 @Injectable()
 export class TradeService {
@@ -26,6 +34,10 @@ export class TradeService {
 
     private userTransactionsService: UserTransactionsService,
 
+    private trueLayerService: TrueLayerService,
+    @Inject(forwardRef(() => WalletService))
+    private readonly walletService: WalletService,
+
     private notificationService: NotificationService,
 
     @InjectConnection() private readonly connection: Connection,
@@ -38,6 +50,16 @@ export class TradeService {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
+      if (tradeData.payment_method === 'Wallet') {
+        const amountToDeduct = tradeData.amount;
+        await this.walletService.deductWallet(
+          userId,
+          amountToDeduct,
+          tradeData.currency,
+          session,
+        );
+      }
+
       const tradeId = this.generateTradeId();
       const amount = Number(tradeData.amount);
       const sold = 0; // Initialize sold to 0
@@ -138,6 +160,15 @@ export class TradeService {
         throw new BadRequestException('Amount exceeds available trade amount');
       }
 
+      if (buyTradeData.payment_method === 'Wallet') {
+        await this.walletService.deductWallet(
+          userId,
+          price,
+          buyTradeData.paid_currency,
+          session,
+        );
+      }
+
       const updatedTrade = await this.tradeModel.findOneAndUpdate(
         { trade_id: buyTradeData.trade_id },
         { $inc: { sold: amountToBuy, available_amount: -amountToBuy } },
@@ -155,6 +186,7 @@ export class TradeService {
         beneficiary_name: buyTradeData.beneficiary_name,
         beneficiary_account: buyTradeData.beneficiary_account,
         beneficiary_bank: buyTradeData.beneficiary_bank,
+        beneficiary_id: buyTradeData.beneficiary_id,
         payment_method: buyTradeData.payment_method,
         price,
         rate: trade.rate,
@@ -196,6 +228,11 @@ export class TradeService {
         `Trade bought with ID: ${trade.trade_id}`,
         'trade',
       );
+
+      // // Check if the trade is completely sold out
+      // if (updatedTrade.available_amount === 0) {
+      //   await this.payoutBeneficiary(updatedTrade.trade_id);
+      // }
 
       await session.commitTransaction();
       return updatedTrade;
@@ -247,9 +284,12 @@ export class TradeService {
     beneficiaryData: CreateBeneficiaryDTO,
   ): Promise<Beneficiary> {
     console.log('Beneficiary Data:', beneficiaryData);
+
+    const beneficiary_id = randomUUID();
     const beneficiary = new this.beneficiaryModel({
       ...beneficiaryData,
       userId,
+      beneficiary_id,
     });
     return await beneficiary.save();
   }
@@ -260,7 +300,7 @@ export class TradeService {
 
   async findBeneficiaryById(beneficiaryId: string): Promise<Beneficiary> {
     const beneficiary = await this.beneficiaryModel
-      .findById(beneficiaryId)
+      .findOne({ beneficiary_id: beneficiaryId })
       .exec();
     if (!beneficiary) {
       throw new NotFoundException(
@@ -341,7 +381,7 @@ export class TradeService {
     }
 
     try {
-      await this.tradeModel.collection.dropIndex('beneficiary_name_1');
+      await this.buyTradeModel.collection.dropIndex('beneficiary_id');
       console.log('beneficiary_name_1 index dropped successfully');
     } catch (error) {
       if (error.codeName === 'IndexNotFound') {
@@ -367,4 +407,98 @@ export class TradeService {
     const indexes = await this.tradeModel.collection.indexes();
     console.log('Indexes:', indexes);
   }
+
+  async payoutBeneficiary(tradeId: string): Promise<any> {
+    const trade = await this.tradeModel.findById(tradeId).exec();
+    if (!trade) {
+      throw new NotFoundException('Trade not found');
+    }
+
+    const beneficiary = await this.findBeneficiaryById(trade.beneficiary_id);
+    if (!beneficiary) {
+      throw new NotFoundException('Beneficiary not found');
+    }
+
+    const withdrawalRequest: WithdrawalRequestDTO = {
+      beneficiary: {
+        type: 'external_account',
+        account_holder_name: beneficiary.name,
+        account_identifier: {
+          type: 'sort_code_account_number',
+          sort_code: beneficiary.sort_code,
+          account_number: beneficiary.account,
+        },
+      },
+      address: {
+        address_line1: beneficiary.address.address_line1,
+        zip: beneficiary.address.zip,
+        city: beneficiary.address.city,
+        state: beneficiary.address.state,
+        country_code: beneficiary.address.country_code,
+      },
+      currency: beneficiary.currency,
+      amount_in_minor: trade.amount,
+      reference: `Trade payout for ${tradeId}`,
+      date_of_birth: beneficiary.date_of_birth,
+    };
+
+    try {
+      const response =
+        await this.trueLayerService.initiateWithdrawal(withdrawalRequest);
+      return response;
+    } catch (error) {
+      throw new HttpException(
+        error.response?.data || 'An error occurred during the payout process',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // async completeTrade(tradeId: string, buyerId: string): Promise<any> {
+  //   const trade = await this.tradeRepository.findOne(tradeId);
+
+  //   if (!trade) {
+  //     throw new NotFoundException('Trade not found');
+  //   }
+
+  //   if (trade.status !== 'AVAILABLE') {
+  //     throw new BadRequestException('Trade is not available for completion');
+  //   }
+
+  //   trade.status = 'BOUGHT';
+  //   trade.buyerId = buyerId;
+  //   await this.buyradeModel.save(trade);
+
+  //   // Retrieve beneficiary details using beneficiaryId
+  //   const beneficiary = await this.userService.getBeneficiary(
+  //     trade.beneficiaryId,
+  //   );
+
+  //   if (!beneficiary) {
+  //     throw new NotFoundException('Beneficiary not found');
+  //   }
+
+  //   // Create withdrawal request
+  //   const withdrawalRequest: WithdrawalRequestDTO = {
+  //     beneficiary: {
+  //       name: beneficiary.name,
+  //       account_number: beneficiary.accountNumber,
+  //       bank_code: beneficiary.bankCode,
+  //       bank_name: beneficiary.bankName,
+  //     },
+  //     address: {
+  //       line1: beneficiary.addressLine1,
+  //       city: beneficiary.city,
+  //       country_code: beneficiary.countryCode,
+  //       postal_code: beneficiary.postalCode,
+  //     },
+  //     currency: trade.currency,
+  //     amount_in_minor: trade.amountInMinor,
+  //     reference: `Trade ${trade.id} Payout`,
+  //     date_of_birth: beneficiary.dateOfBirth,
+  //   };
+
+  //   // Initiate withdrawal
+  //   await this.trueLayerService.initiateWithdrawal(withdrawalRequest);
+  // }
 }

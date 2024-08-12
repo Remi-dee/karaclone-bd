@@ -129,4 +129,18 @@ export class WalletController {
     const userId = req.user.id; // Assuming user ID is stored in request.user
     return this.walletService.fundWallet(userId, fundWalletDTO);
   }
+
+  // @Post('deduct')
+  // @ApiOperation({ summary: 'Deduct amount from wallet' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Amount deducted successfully',
+  // })
+  // @ApiResponse({ status: 404, description: 'Wallet not found' })
+  // @ApiResponse({ status: 400, description: 'Insufficient funds' })
+  // async deductWallet(@Req() req, @Body() body: DeductWalletDTO) {
+  //   const userId = req.user.id; // Assuming user ID is stored in request.user
+  //   const { currency_code, amount } = body;
+  //   return this.walletService.deductWallet(userId, currency_code, amount, '');
+  // }
 }

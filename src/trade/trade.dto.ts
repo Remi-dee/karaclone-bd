@@ -70,6 +70,10 @@ export class CreateTradeDTO {
   @ApiProperty({ description: 'Beneficiary Account' })
   @IsNotEmpty({ message: 'Beneficiary account is required' })
   readonly beneficiary_bank: string;
+
+  @ApiProperty({ description: 'Beneficiary id' })
+  @IsNotEmpty({ message: 'Beneficiary id is required' })
+  readonly beneficiary_id: string;
 }
 
 export class UpdateTradeDTO {
@@ -156,4 +160,8 @@ export class BuyTradeDTO {
   @ApiProperty({ description: 'rate' })
   @IsOptional()
   readonly rate: string;
+
+  @ApiProperty({ description: 'Beneficiary id' })
+  @IsNotEmpty({ message: 'Beneficiary id is required' })
+  readonly beneficiary_id: string;
 }

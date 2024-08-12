@@ -141,6 +141,22 @@ export class UserTransactionsController {
     return await this.userTransactionsService.remove(id);
   }
 
+  @Delete()
+  @ApiOperation({ summary: 'Delete all transactions for the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully deleted all transactions.',
+  })
+  async deleteAll(@Req() req: any, @Res() res: any): Promise<any> {
+    const user_id = req.user.id;
+    const { deletedCount } =
+      await this.userTransactionsService.deleteAll(user_id);
+    return res.status(HttpStatus.OK).json({
+      message: 'All transactions deleted successfully',
+      deletedCount,
+    });
+  }
+
   @Post('drop-index')
   @ApiOperation({ summary: 'Drop the unique index on beneficiary_account' })
   async dropIndex(): Promise<void> {
