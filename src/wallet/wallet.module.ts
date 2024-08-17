@@ -8,9 +8,11 @@ import { WalletController } from './wallet.controller';
 import { UserTransactionsModule } from 'src/users-transactions/user-transactions.module';
 
 import { TradeModule } from 'src/trade/trade.module';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
+    NotificationModule,
     UserTransactionsModule,
     MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
