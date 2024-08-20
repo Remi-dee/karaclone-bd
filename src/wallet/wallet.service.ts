@@ -74,9 +74,9 @@ export class WalletService {
   async fundWallet(
     userId: Types.ObjectId,
     fundWalletDTO: CreateWalletDTO,
-  ): Promise<Wallet> {
+  ): Promise<any> {
     const { currency_code, amount } = fundWalletDTO;
-
+    console.log('we got to transaction 1');
     const wallet = await this._walletModel
       .findOne({ user: userId, currency_code })
       .exec();
@@ -84,6 +84,7 @@ export class WalletService {
     if (wallet) {
       wallet.escrow_balance += amount;
       await wallet.save();
+      console.log('we got to transaction 2');
     } else {
       const newWallet = new this._walletModel({
         user: userId,
@@ -91,40 +92,43 @@ export class WalletService {
         amount,
       });
 
-      const transactionData = {
-        user_transactionId: this.tradeService.generateTradeId(),
-        date: new Date().toLocaleString(),
-        transaction_type: 'Deposit',
-        bank_name: 'N/A',
-        account_name: 'N/A',
-        transaction_fee: 2.35,
-        status: 'Successful',
-        payment_method: 'Connect with bank',
-        beneficiary_name: 'N/A',
-        beneficiary_account: 'N/A',
-        beneficiary_bank: 'N/A',
-        currency: fundWalletDTO.currency_code,
-        user_id: fundWalletDTO.user,
-        amount_exchanged: 'N/A',
-        amount_received: 'N/A',
-        amount_reversed: 'N/A',
-        amount_deposited: amount.toString(),
-        amount_sold: 'N/A',
-        rate: 'N/A',
-      };
-
-      const transaction =
-        await this.userTransactionsService.create(transactionData);
-      console.log('transaction is', transaction);
-
-      await this.notificationService.createNotification(
-        userId.toString(),
-        `Wallet funded with ID: ${transactionData.user_transactionId}`,
-        'Deposit',
-      );
-
-      return await newWallet.save();
+      await newWallet.save();
     }
+
+    console.log('we got to transaction 3');
+    const transactionData = {
+      user_transactionId: this.tradeService.generateTradeId(),
+      date: new Date().toLocaleString(),
+      transaction_type: 'Deposit',
+      bank_name: '',
+      account_name: '',
+      transaction_fee: 2.35,
+      status: 'Successful',
+      payment_method: 'Connect with bank',
+      beneficiary_name: '',
+      beneficiary_account: '',
+      beneficiary_bank: '',
+      currency: fundWalletDTO.currency_code,
+      user_id: userId,
+      amount_exchanged: '',
+      amount_received: '',
+      amount_reversed: '',
+      amount_deposited: amount.toString(),
+      amount_sold: '',
+      rate: '',
+    };
+
+    const transaction =
+      await this.userTransactionsService.create(transactionData);
+    console.log('transaction is', transaction);
+
+    await this.notificationService.createNotification(
+      userId.toString(),
+      `Wallet funded with ID: ${transactionData.user_transactionId}`,
+      'Deposit',
+    );
+
+    return { status: 'Successful' };
   }
 
   async createDefaultWallets(userId: Types.ObjectId): Promise<void> {

@@ -38,7 +38,7 @@ export class UserTransaction {
   readonly beneficiary_name: string;
 
   @Prop({ required: false })
-  readonly beneficiary_account: number;
+  readonly beneficiary_account: string;
 
   @Prop({ required: false })
   readonly beneficiary_bank: string;

@@ -186,7 +186,7 @@ export class UserService {
     await user.save();
   }
 
-  async disableTwoFA( userId ): Promise<void> {
+  async disableTwoFA(userId): Promise<void> {
     const user = await this.userModel.findById(userId);
     if (!user) {
       throw new ErrorHandler('User not found', 404);
